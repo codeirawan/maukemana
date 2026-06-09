@@ -9,13 +9,12 @@ import ItemList from "../components/items/ItemList";
 export default function WishlistPage({ showToast }) {
   const { user } = useAuth();
   const { items, addItem, markVisited } = useItems();
-  const [showForm, setShowForm] = useState(false);
-  const [visitingItem, setVisitingItem] = useState(null);
-  const [catFilter, setCatFilter] = useState("semua");
-  const [cityFilter, setCityFilter] = useState("semua");
+  const [showForm, setShowForm]       = useState(false);
+  const [visitingItem, setVisiting]   = useState(null);
+  const [catFilter, setCatFilter]     = useState("semua");
+  const [cityFilter, setCityFilter]   = useState("semua");
 
   const wishlist = items.filter((i) => !i.archived);
-
   const filtered = wishlist.filter((i) => {
     if (catFilter !== "semua" && i.category !== catFilter) return false;
     if (cityFilter !== "semua" && i.city !== cityFilter) return false;
@@ -24,39 +23,30 @@ export default function WishlistPage({ showToast }) {
 
   async function handleVisitConfirm({ rating, photoUrl, photoPath }) {
     await markVisited(visitingItem.id, { rating, photoUrl, photoPath });
-    setVisitingItem(null);
-    showToast("Ditandai sudah dikunjungi!");
+    setVisiting(null);
+    showToast("Ditandai sudah dikunjungi! 🎉");
   }
 
   return (
     <div className="page-content">
       {!user && (
-        <div className="auth-prompt">
-          <p>Login untuk sync data ke semua perangkat</p>
+        <div className="sync-hint">
+          <span>☁️ Login untuk sync ke semua perangkat</span>
         </div>
       )}
-
-      {showForm
-        ? <AddForm items={items} onAdd={addItem} onCancel={() => setShowForm(false)} showToast={showToast} />
-        : (
-          <button className="btn btn-primary" style={{ width: "100%", marginBottom: "1rem" }} onClick={() => setShowForm(true)}>
-            + Tambah Tempat
-          </button>
-        )
-      }
 
       {wishlist.length > 0 && (
         <FilterBar
           items={wishlist}
-          catFilter={catFilter} setCatFilter={(v) => { setCatFilter(v); }}
-          cityFilter={cityFilter} setCityFilter={(v) => { setCityFilter(v); }}
+          catFilter={catFilter} setCatFilter={setCatFilter}
+          cityFilter={cityFilter} setCityFilter={setCityFilter}
         />
       )}
 
       <ItemList
         items={filtered}
         mode="wishlist"
-        onVisit={setVisitingItem}
+        onVisit={setVisiting}
         onRestore={() => {}}
         onDelete={() => {}}
         emptyState={
@@ -66,8 +56,31 @@ export default function WishlistPage({ showToast }) {
         }
       />
 
+      {/* FAB */}
+      <button className="fab" onClick={() => setShowForm(true)} title="Tambah tempat">
+        +
+      </button>
+
+      {/* Bottom sheet form */}
+      {showForm && (
+        <div className="sheet-overlay" onClick={() => setShowForm(false)}>
+          <div className="bottom-sheet" onClick={(e) => e.stopPropagation()}>
+            <AddForm
+              items={items}
+              onAdd={addItem}
+              onClose={() => setShowForm(false)}
+              showToast={showToast}
+            />
+          </div>
+        </div>
+      )}
+
       {visitingItem && (
-        <VisitModal item={visitingItem} onConfirm={handleVisitConfirm} onClose={() => setVisitingItem(null)} />
+        <VisitModal
+          item={visitingItem}
+          onConfirm={handleVisitConfirm}
+          onClose={() => setVisiting(null)}
+        />
       )}
     </div>
   );

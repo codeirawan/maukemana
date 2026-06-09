@@ -4,29 +4,38 @@ import { uploadPhoto } from "../../services/photoStorage";
 import { validateItem } from "../../utils/validate";
 import StarPicker from "./StarPicker";
 
-const CATEGORIES = ["resto", "cafe", "tempat", "hotel"];
-const PRICE_LABELS = { 1: "$", 2: "$$", 3: "$$$" };
+const CATEGORIES = [
+  { value: "resto",  label: "🍽️ Resto" },
+  { value: "cafe",   label: "☕ Cafe" },
+  { value: "tempat", label: "📍 Tempat" },
+  { value: "hotel",  label: "🏨 Hotel" },
+];
+const PRICES = [
+  { value: 1, label: "$" },
+  { value: 2, label: "$$" },
+  { value: 3, label: "$$$" },
+];
 
-export default function AddForm({ items, onAdd, onCancel, showToast }) {
+export default function AddForm({ items, onAdd, onClose, showToast }) {
   const { user } = useAuth();
-  const [name, setName] = useState("");
+  const [name, setName]         = useState("");
   const [category, setCategory] = useState("resto");
-  const [city, setCity] = useState("");
-  const [notes, setNotes] = useState("");
-  const [priceRange, setPriceRange] = useState(null);
-  const [mapsUrl, setMapsUrl] = useState("");
-  const [rating, setRating] = useState(null);
-  const [photoFile, setPhotoFile] = useState(null);
-  const [photoPreview, setPhotoPreview] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [city, setCity]         = useState("");
+  const [notes, setNotes]       = useState("");
+  const [priceRange, setPrice]  = useState(null);
+  const [mapsUrl, setMapsUrl]   = useState("");
+  const [rating, setRating]     = useState(null);
+  const [photoFile, setPhoto]   = useState(null);
+  const [photoPreview, setPreview] = useState("");
+  const [error, setError]       = useState("");
+  const [loading, setLoading]   = useState(false);
   const fileRef = useRef();
 
   function handlePhoto(e) {
     const file = e.target.files?.[0];
     if (!file) return;
-    setPhotoFile(file);
-    setPhotoPreview(URL.createObjectURL(file));
+    setPhoto(file);
+    setPreview(URL.createObjectURL(file));
   }
 
   async function handleSubmit(e) {
@@ -37,12 +46,11 @@ export default function AddForm({ items, onAdd, onCancel, showToast }) {
     try {
       let photoUrl = "", photoPath = "";
       if (photoFile && user) {
-        const tempId = Date.now();
-        ({ photoUrl, photoPath } = await uploadPhoto(user.uid, tempId, photoFile));
+        ({ photoUrl, photoPath } = await uploadPhoto(user.uid, Date.now(), photoFile));
       }
       await onAdd({ name, category, city, notes, priceRange, mapsUrl, rating, photoUrl, photoPath });
       showToast("Tempat ditambahkan!");
-      onCancel();
+      onClose();
     } catch {
       setError("Gagal menyimpan, coba lagi.");
     } finally {
@@ -51,49 +59,119 @@ export default function AddForm({ items, onAdd, onCancel, showToast }) {
   }
 
   return (
-    <form className="add-form" onSubmit={handleSubmit}>
-      <div className="add-form-title">+ Tambah Tempat</div>
+    <form onSubmit={handleSubmit}>
+      <div className="sheet-handle" />
+      <div className="sheet-title">Tambah Tempat</div>
 
-      <div className="form-row">
-        <input className="input" placeholder="Nama tempat / resto *" value={name} onChange={(e) => { setName(e.target.value); setError(""); }} />
-        <select className="input" value={category} onChange={(e) => setCategory(e.target.value)}>
-          {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
-        </select>
+      {/* Nama */}
+      <div className="field">
+        <input
+          className="input input-lg"
+          placeholder="Nama tempat atau restoran *"
+          value={name}
+          onChange={(e) => { setName(e.target.value); setError(""); }}
+          autoFocus
+        />
       </div>
 
-      <div className="form-row">
-        <input className="input" placeholder="Kota *" value={city} onChange={(e) => { setCity(e.target.value); setError(""); }} />
-        <select className="input" value={priceRange ?? ""} onChange={(e) => setPriceRange(e.target.value ? Number(e.target.value) : null)}>
-          <option value="">Harga (opsional)</option>
-          {[1, 2, 3].map((n) => <option key={n} value={n}>{PRICE_LABELS[n]}</option>)}
-        </select>
+      {/* Kategori chips */}
+      <div className="field">
+        <div className="field-label">Kategori</div>
+        <div className="chip-group">
+          {CATEGORIES.map((c) => (
+            <button
+              key={c.value}
+              type="button"
+              className={`chip${category === c.value ? " active" : ""}`}
+              onClick={() => setCategory(c.value)}
+            >
+              {c.label}
+            </button>
+          ))}
+        </div>
       </div>
 
-      <input className="input" placeholder="Catatan (opsional)" value={notes} onChange={(e) => setNotes(e.target.value)} style={{ marginBottom: ".5rem" }} />
-      <input className="input" placeholder="Link Google Maps (opsional)" value={mapsUrl} onChange={(e) => setMapsUrl(e.target.value)} />
+      {/* Kota + Harga */}
+      <div className="field-row">
+        <div className="field" style={{ flex: 1 }}>
+          <input
+            className="input"
+            placeholder="Kota *"
+            value={city}
+            onChange={(e) => { setCity(e.target.value); setError(""); }}
+          />
+        </div>
+        <div className="field" style={{ flexShrink: 0 }}>
+          <div className="chip-group">
+            {PRICES.map((p) => (
+              <button
+                key={p.value}
+                type="button"
+                className={`chip chip-price${priceRange === p.value ? " active" : ""}`}
+                onClick={() => setPrice(priceRange === p.value ? null : p.value)}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
 
-      <div style={{ display: "flex", gap: "1rem", alignItems: "center", marginTop: ".75rem", flexWrap: "wrap" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: ".5rem" }}>
-          <span className="text-sm text-muted">Rating:</span>
-          <StarPicker value={rating} onChange={setRating} />
+      {/* Catatan */}
+      <div className="field">
+        <input
+          className="input"
+          placeholder="💬 Catatan (opsional)"
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+        />
+      </div>
+
+      {/* Maps */}
+      <div className="field">
+        <input
+          className="input"
+          placeholder="🗺️ Link Google Maps (opsional)"
+          value={mapsUrl}
+          onChange={(e) => setMapsUrl(e.target.value)}
+        />
+      </div>
+
+      {/* Rating + Foto */}
+      <div className="field-row" style={{ alignItems: "center", gap: "1rem" }}>
+        <div>
+          <div className="field-label">Rating awal</div>
+          <StarPicker value={rating} onChange={setRating} size="lg" />
         </div>
 
-        <label className={`photo-upload-btn${photoPreview ? " has-photo" : ""}${!user ? " btn-disabled" : ""}`}
-          title={!user ? "Login untuk upload foto" : ""}>
-          <input ref={fileRef} type="file" accept="image/*" style={{ display: "none" }} onChange={handlePhoto} disabled={!user} />
-          {photoPreview
-            ? <><img src={photoPreview} alt="" style={{ width: 24, height: 24, borderRadius: 4, objectFit: "cover" }} /> Foto dipilih</>
-            : <>{!user ? "🔒 Login untuk foto" : "📷 Upload foto"}</>
-          }
+        <label
+          className={`photo-upload-btn${photoPreview ? " has-photo" : ""}`}
+          style={{ flex: 1 }}
+          title={!user ? "Login untuk upload foto" : ""}
+        >
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/*"
+            style={{ display: "none" }}
+            onChange={handlePhoto}
+            disabled={!user}
+          />
+          {photoPreview ? (
+            <>
+              <img src={photoPreview} alt="" style={{ width: 24, height: 24, borderRadius: 4, objectFit: "cover" }} />
+              Foto dipilih
+            </>
+          ) : !user ? "🔒 Login untuk foto" : "📷 Foto"}
         </label>
       </div>
 
       {error && <div className="form-error">{error}</div>}
 
-      <div className="form-actions">
-        <button type="button" className="btn btn-ghost btn-sm" onClick={onCancel}>Batal</button>
-        <button type="submit" className="btn btn-primary btn-sm" disabled={loading}>
-          {loading ? "Menyimpan..." : "Simpan"}
+      <div className="sheet-actions">
+        <button type="button" className="btn btn-ghost" onClick={onClose}>Batal</button>
+        <button type="submit" className="btn btn-primary" style={{ flex: 1 }} disabled={loading}>
+          {loading ? "Menyimpan..." : "Simpan Tempat"}
         </button>
       </div>
     </form>

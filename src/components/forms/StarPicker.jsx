@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function StarPicker({ value, onChange, readonly = false }) {
+export default function StarPicker({ value, onChange, readonly = false, size }) {
   const [hovered, setHovered] = useState(0);
 
   return (
@@ -8,7 +8,7 @@ export default function StarPicker({ value, onChange, readonly = false }) {
       {[1, 2, 3, 4, 5].map((n) => (
         <span
           key={n}
-          className={`star${(hovered || value) >= n ? " filled" : " empty"}${readonly ? " readonly" : ""}`}
+          className={`star${size === "lg" ? " lg" : ""}${(hovered || value) >= n ? " filled" : " empty"}${readonly ? " readonly" : ""}`}
           onClick={() => !readonly && onChange(value === n ? null : n)}
           onMouseEnter={() => !readonly && setHovered(n)}
           onMouseLeave={() => !readonly && setHovered(0)}
