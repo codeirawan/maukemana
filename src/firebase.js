@@ -1,14 +1,12 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from "firebase/firestore";
-import { getStorage } from "firebase/storage";
-
 export const configValid = !!(
   import.meta.env.VITE_FIREBASE_API_KEY &&
   import.meta.env.VITE_FIREBASE_PROJECT_ID
 );
 
-let app, auth, db, storage;
+let app, auth, db;
 
 if (configValid) {
   app = initializeApp({
@@ -27,8 +25,6 @@ if (configValid) {
       tabManager: persistentMultipleTabManager(),
     }),
   });
-
-  storage = getStorage(app);
 }
 
-export { auth, db, storage };
+export { auth, db };
