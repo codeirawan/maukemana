@@ -7,6 +7,7 @@ import {
 import {
   subscribeItems, cloudAdd, cloudUpdate, cloudDelete, cloudMigrate,
 } from "../services/itemsCloud";
+import { deletePhoto } from "../services/photoStorage";
 
 export function useItems() {
   const { user } = useAuth();
@@ -85,7 +86,6 @@ export function useItems() {
 
   async function deleteItem(id, photoPath) {
     if (photoPath) {
-      const { deletePhoto } = await import("../services/photoStorage");
       await deletePhoto(photoPath);
     }
     if (user) {
