@@ -16,7 +16,7 @@ function sortItems(arr, sort) {
   return copy.sort((a, b) => (b.addedAt || "").localeCompare(a.addedAt || ""));
 }
 
-export default function ArchivePage({ showToast }) {
+export default function ArchivePage({ showToast, onEditItem }) {
   const { items, restoreItem, deleteItem } = useItems();
   const [catFilter, setCatFilter]   = useState("semua");
   const [cityFilter, setCityFilter] = useState("semua");
@@ -24,29 +24,26 @@ export default function ArchivePage({ showToast }) {
   const [sort, setSort]             = useState("newest");
   const [selectedItem, setSelected] = useState(null);
 
-  const archive = items.filter((i) => i.archived);
+  const archive = items.filter(i => i.archived);
 
   const filtered = useMemo(() => {
     let arr = archive;
-    if (catFilter !== "semua") arr = arr.filter((i) => i.category === catFilter);
-    if (cityFilter !== "semua") arr = arr.filter((i) => i.city === cityFilter);
+    if (catFilter !== "semua") arr = arr.filter(i => i.category === catFilter);
+    if (cityFilter !== "semua") arr = arr.filter(i => i.city === cityFilter);
     if (search) {
       const q = search.toLowerCase();
-      arr = arr.filter((i) =>
+      arr = arr.filter(i =>
         i.name.toLowerCase().includes(q) ||
-        i.city.toLowerCase().includes(q) ||
+        (i.city || "").toLowerCase().includes(q) ||
         (i.notes || "").toLowerCase().includes(q)
       );
     }
     return sortItems(arr, sort);
   }, [archive, catFilter, cityFilter, search, sort]);
 
-  const wishlistCount = items.filter((i) => !i.archived).length;
-  const cities = [...new Set(items.map((i) => i.city).filter(Boolean))];
-
   async function handleRestore(id) {
     await restoreItem(id);
-    showToast("Dipindahkan kembali ke wishlist");
+    showToast("Dipindahkan kembali ke rencana");
   }
 
   async function handleDelete(id, photoPath) {
@@ -55,34 +52,15 @@ export default function ArchivePage({ showToast }) {
   }
 
   return (
-    <div className="page-content">
-      <div className="page-header">
-        <div className="page-eyebrow">Kenangan Perjalanan</div>
-        <div className="page-title">Sudah <em>Dikunjungi</em></div>
-        <div className="page-sub">tempat yang telah kamu jelajahi</div>
+    <>
+      <div style={{ position: "relative" }}>
+        <svg style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" strokeWidth="2.5" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input className="input" style={{ paddingLeft: 34 }} placeholder="Cari nama, kota, atau catatan…"
+          value={search} onChange={e => setSearch(e.target.value)} />
+        {search && <button style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--muted)", fontSize: "1rem" }} onClick={() => setSearch("")}>✕</button>}
       </div>
 
-      <div className="stats-row">
-        <div className="stat-box">
-          <div className="stat-val">{archive.length}</div>
-          <div className="stat-lbl">Dikunjungi</div>
-        </div>
-        <div className="stat-box">
-          <div className="stat-val">{wishlistCount}</div>
-          <div className="stat-lbl">Wishlist</div>
-        </div>
-        <div className="stat-box">
-          <div className="stat-val">{cities.length}</div>
-          <div className="stat-lbl">Kota</div>
-        </div>
-      </div>
-
-      <div className="search-wrap">
-        <span className="search-icon">🔍</span>
-        <input className="input" placeholder="Cari nama, kota, atau catatan…"
-          value={search} onChange={(e) => setSearch(e.target.value)} />
-        {search && <button className="search-clear" onClick={() => setSearch("")}>✕</button>}
-      </div>
+      <div style={{ marginBottom: 10 }} />
 
       {archive.length > 0 && (
         <FilterBar
@@ -100,8 +78,8 @@ export default function ArchivePage({ showToast }) {
         onCardClick={setSelected}
         emptyState={
           search || catFilter !== "semua" || cityFilter !== "semua"
-            ? { icon: "🔍", title: "Tidak ada hasil", desc: "Coba ubah filter atau kata kunci." }
-            : { icon: "✅", title: "Belum ada yang dikunjungi", desc: "Klik 'Sudah!' di tab Wishlist setelah berkunjung." }
+            ? { icon: "📭", title: "Tidak ada hasil", desc: "Coba ubah filter atau kata kunci." }
+            : { icon: "✅", title: "Belum ada yang dikunjungi", desc: "Klik 'Sudah!' setelah berkunjung ke suatu tempat." }
         }
       />
 
@@ -111,10 +89,11 @@ export default function ArchivePage({ showToast }) {
           mode="archive"
           onClose={() => setSelected(null)}
           onVisit={() => {}}
-          onRestore={async (id) => { await handleRestore(id); setSelected(null); }}
+          onEdit={onEditItem ? item => { setSelected(null); onEditItem(item); } : null}
+          onRestore={async id => { await handleRestore(id); setSelected(null); }}
           onDelete={async (id, path) => { await handleDelete(id, path); setSelected(null); }}
         />
       )}
-    </div>
+    </>
   );
 }

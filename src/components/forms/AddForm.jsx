@@ -12,45 +12,47 @@ const CATEGORIES = [
   { value: "tempat", label: "📍 Tempat" },
   { value: "hotel",  label: "🏨 Hotel" },
 ];
-const PRICES = [
-  { value: 1, label: "$" },
-  { value: 2, label: "$$" },
-  { value: 3, label: "$$$" },
-];
 const PRIORITIES = [
   { value: "high", label: "🔴 Tinggi" },
   { value: "med",  label: "🟡 Sedang" },
   { value: "low",  label: "🟢 Rendah" },
 ];
 
-export default function AddForm({ items, onAdd, onClose, showToast }) {
+function defaultScheduledAt() {
+  const d = new Date();
+  d.setDate(d.getDate() + 7);
+  d.setHours(12, 0, 0, 0);
+  return d.toISOString().slice(0, 16);
+}
+
+export default function AddForm({ items, onAdd, editItem, onUpdate, onClose, showToast }) {
   const { user } = useAuth();
+  const isEdit = !!editItem;
 
-  const [name, setName]         = useState("");
-  const [category, setCategory] = useState("resto");
-  const [city, setCity]         = useState("");
-  const [notes, setNotes]       = useState("");
-  const [priceRange, setPrice]  = useState(null);
-  const [mapsUrl, setMapsUrl]   = useState("");
-  const [priority, setPriority] = useState(null);
-  const [rating, setRating]     = useState(null);
-  const [photoFile, setPhoto]   = useState(null);
-  const [photoPreview, setPreview] = useState("");
+  const [name, setName]             = useState(editItem?.name || "");
+  const [category, setCategory]     = useState(editItem?.category || "resto");
+  const [notes, setNotes]           = useState(editItem?.notes || "");
+  const [mapsUrl, setMapsUrl]       = useState(editItem?.mapsUrl || "");
+  const [priority, setPriority]     = useState(editItem?.priority || null);
+  const [scheduledAt, setScheduled] = useState(editItem?.scheduledAt || defaultScheduledAt());
 
-  // Google Maps fields
-  const [lat, setLat]         = useState(null);
-  const [lng, setLng]         = useState(null);
-  const [placeId, setPlaceId] = useState("");
-  const [address, setAddress] = useState("");
+  // Edit-only fields
+  const [rating, setRating]         = useState(editItem?.rating || null);
+  const [photoFile, setPhoto]       = useState(null);
+  const [photoPreview, setPreview]  = useState(editItem?.photoUrl || "");
 
-  const [error, setError]   = useState("");
+  // Google Maps
+  const [lat, setLat]         = useState(editItem?.lat || null);
+  const [lng, setLng]         = useState(editItem?.lng || null);
+  const [placeId, setPlaceId] = useState(editItem?.placeId || "");
+  const [address, setAddress] = useState(editItem?.address || "");
+
+  const [error, setError]     = useState("");
   const [loading, setLoading] = useState(false);
   const fileRef = useRef();
 
-  // Called when user picks a place from autocomplete
   function handlePlaceSelect(details) {
     setName(details.name);
-    setCity(details.city || city);
     setMapsUrl(details.mapsUrl || "");
     setLat(details.lat);
     setLng(details.lng);
@@ -58,7 +60,6 @@ export default function AddForm({ items, onAdd, onClose, showToast }) {
     setAddress(details.address);
     setError("");
 
-    // Guess category from name keywords
     const lower = details.name.toLowerCase();
     if (lower.includes("cafe") || lower.includes("kopi") || lower.includes("coffee")) setCategory("cafe");
     else if (lower.includes("hotel") || lower.includes("inn") || lower.includes("resort")) setCategory("hotel");
@@ -75,19 +76,25 @@ export default function AddForm({ items, onAdd, onClose, showToast }) {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    const err = validateItem({ name, category, city }, items);
+    const err = validateItem({ name, category }, items, isEdit ? editItem.id : null);
     if (err) { setError(err); return; }
     setLoading(true);
     try {
-      let photoUrl = "", photoPath = "";
-      if (photoFile && user) {
-        ({ photoUrl, photoPath } = await uploadPhoto(user.uid, Date.now(), photoFile));
+      if (isEdit) {
+        let photoUrl = editItem.photoUrl || "";
+        let photoPath = editItem.photoPath || "";
+        if (photoFile && user) {
+          ({ photoUrl, photoPath } = await uploadPhoto(user.uid, editItem.id, photoFile));
+        }
+        await onUpdate(editItem.id, {
+          name, category, notes, priority, scheduledAt, mapsUrl,
+          rating, photoUrl, photoPath, lat, lng, placeId, address,
+        });
+        showToast("Tempat diperbarui!");
+      } else {
+        await onAdd({ name, category, notes, priority, scheduledAt, mapsUrl, lat, lng, placeId, address });
+        showToast("Ditambahkan ke itinerary!");
       }
-      await onAdd({
-        name, category, city, notes, priceRange, priority, mapsUrl, rating,
-        photoUrl, photoPath, lat, lng, placeId, address,
-      });
-      showToast("Tempat ditambahkan!");
       onClose();
     } catch {
       setError("Gagal menyimpan, coba lagi.");
@@ -99,11 +106,11 @@ export default function AddForm({ items, onAdd, onClose, showToast }) {
   return (
     <form onSubmit={handleSubmit}>
       <div className="sheet-handle" />
-      <div className="sheet-title">Tambah Tempat</div>
+      <div className="sheet-title">{isEdit ? "Edit Tempat" : "Tambah ke Itinerary"}</div>
 
-      {/* Name — Places autocomplete if key available, else manual input */}
+      {/* Name */}
       <div className="field">
-        {gmapsValid ? (
+        {gmapsValid && !isEdit ? (
           <>
             <PlacesSearch onSelect={handlePlaceSelect} initialValue={name} />
             {name && (
@@ -122,12 +129,12 @@ export default function AddForm({ items, onAdd, onClose, showToast }) {
             placeholder="Nama tempat atau restoran *"
             value={name}
             onChange={(e) => { setName(e.target.value); setError(""); }}
-            autoFocus
+            autoFocus={!isEdit}
           />
         )}
       </div>
 
-      {/* Kategori chips */}
+      {/* Kategori */}
       <div className="field">
         <div className="field-label">Kategori</div>
         <div className="chip-group">
@@ -155,30 +162,18 @@ export default function AddForm({ items, onAdd, onClose, showToast }) {
         </div>
       </div>
 
-      {/* Kota + Harga */}
-      <div className="field-row">
-        <div className="field" style={{ flex: 1 }}>
-          <input
-            className="input"
-            placeholder="Kota *"
-            value={city}
-            onChange={(e) => { setCity(e.target.value); setError(""); }}
-          />
-        </div>
-        <div className="field" style={{ flexShrink: 0 }}>
-          <div className="chip-group">
-            {PRICES.map((p) => (
-              <button key={p.value} type="button"
-                className={`chip chip-price${priceRange === p.value ? " active" : ""}`}
-                onClick={() => setPrice(priceRange === p.value ? null : p.value)}>
-                {p.label}
-              </button>
-            ))}
-          </div>
-        </div>
+      {/* Tanggal & Jam */}
+      <div className="field">
+        <div className="field-label">Tanggal &amp; Jam Rencana</div>
+        <input
+          type="datetime-local"
+          className="input"
+          value={scheduledAt}
+          onChange={(e) => setScheduled(e.target.value)}
+        />
       </div>
 
-      {/* Address dari Google (read-only hint) */}
+      {/* Address dari Google (read-only) */}
       {address && (
         <div className="field">
           <div className="field-label">Alamat</div>
@@ -195,32 +190,34 @@ export default function AddForm({ items, onAdd, onClose, showToast }) {
       {/* Maps URL */}
       <div className="field">
         <input className="input"
-          placeholder="🗺️ Link Google Maps (opsional — otomatis jika pakai search)"
+          placeholder="🗺️ Link Google Maps (opsional)"
           value={mapsUrl} onChange={(e) => setMapsUrl(e.target.value)} />
       </div>
 
-      {/* Rating + Foto */}
-      <div className="field-row" style={{ alignItems: "center", gap: "1rem" }}>
-        <div>
-          <div className="field-label">Rating awal</div>
-          <StarPicker value={rating} onChange={setRating} size="lg" />
+      {/* Rating + Foto — edit only */}
+      {isEdit && (
+        <div className="field-row" style={{ alignItems: "center", gap: "1rem" }}>
+          <div>
+            <div className="field-label">Rating</div>
+            <StarPicker value={rating} onChange={setRating} size="lg" />
+          </div>
+          <label className={`photo-upload-btn${photoPreview ? " has-photo" : ""}`} style={{ flex: 1 }}
+            title={!user ? "Login untuk upload foto" : ""}>
+            <input ref={fileRef} type="file" accept="image/*" style={{ display: "none" }}
+              onChange={handlePhoto} disabled={!user} />
+            {photoPreview
+              ? <><img src={photoPreview} alt="" style={{ width: 24, height: 24, borderRadius: 4, objectFit: "cover" }} /> Foto dipilih</>
+              : !user ? "🔒 Login untuk foto" : "📷 Foto"}
+          </label>
         </div>
-        <label className={`photo-upload-btn${photoPreview ? " has-photo" : ""}`} style={{ flex: 1 }}
-          title={!user ? "Login untuk upload foto" : ""}>
-          <input ref={fileRef} type="file" accept="image/*" style={{ display: "none" }}
-            onChange={handlePhoto} disabled={!user} />
-          {photoPreview
-            ? <><img src={photoPreview} alt="" style={{ width: 24, height: 24, borderRadius: 4, objectFit: "cover" }} /> Foto dipilih</>
-            : !user ? "🔒 Login untuk foto" : "📷 Foto"}
-        </label>
-      </div>
+      )}
 
       {error && <div className="form-error">{error}</div>}
 
       <div className="sheet-actions">
         <button type="button" className="btn btn-ghost" onClick={onClose}>Batal</button>
         <button type="submit" className="btn btn-primary" style={{ flex: 1 }} disabled={loading}>
-          {loading ? "Menyimpan..." : "Simpan Tempat"}
+          {loading ? "Menyimpan..." : isEdit ? "Simpan Perubahan" : "Simpan Tempat"}
         </button>
       </div>
     </form>

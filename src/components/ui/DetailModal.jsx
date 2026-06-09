@@ -1,12 +1,21 @@
 import { useState } from "react";
 import StarPicker from "../forms/StarPicker";
 
-const CAT_EMOJI  = { resto: "🍽️", cafe: "☕", tempat: "📍", hotel: "🏨" };
-const CAT_STRIP  = { resto: "var(--cat-resto)", cafe: "var(--cat-cafe)", tempat: "var(--cat-tempat)", hotel: "var(--cat-hotel)" };
-const PRICE_LBL  = { 1: "$ — Murah", 2: "$$ — Sedang", 3: "$$$ — Mahal" };
-const PRIO_LBL   = { high: "Tinggi", med: "Sedang", low: "Rendah" };
+const CAT_EMOJI = { resto: "🍽️", cafe: "☕", tempat: "📍", hotel: "🏨" };
+const CAT_COLOR = { resto: "#C84B31", cafe: "#8B5E3C", tempat: "#2D6A4F", hotel: "#1A5276" };
+const PRIO_LBL  = { high: "Tinggi", med: "Sedang", low: "Rendah" };
 
-export default function DetailModal({ item, mode, onClose, onVisit, onRestore, onDelete }) {
+function fmtScheduled(val) {
+  if (!val) return null;
+  try {
+    return new Date(val).toLocaleString("id-ID", {
+      weekday: "short", day: "numeric", month: "long",
+      year: "numeric", hour: "2-digit", minute: "2-digit",
+    });
+  } catch { return val; }
+}
+
+export default function DetailModal({ item, mode, onClose, onVisit, onRestore, onDelete, onEdit }) {
   const [confirming, setConfirming] = useState(false);
 
   function handleOverlay(e) {
@@ -16,7 +25,7 @@ export default function DetailModal({ item, mode, onClose, onVisit, onRestore, o
   return (
     <div className="detail-overlay" onClick={handleOverlay}>
       <div className="detail-sheet">
-        <div className="detail-strip" style={{ background: CAT_STRIP[item.category] ?? "#64748B" }} />
+        <div className="detail-strip" style={{ background: CAT_COLOR[item.category] ?? "#64748B" }} />
 
         <div className="detail-head">
           <button className="detail-close" onClick={onClose}>✕</button>
@@ -29,23 +38,25 @@ export default function DetailModal({ item, mode, onClose, onVisit, onRestore, o
 
           <div className="detail-meta">
             <div className="detail-row">
-              <span className="detail-key">Kota</span>
-              <span className="detail-val">{item.city}</span>
-            </div>
-            <div className="detail-row">
               <span className="detail-key">Kategori</span>
               <span className="detail-val">{item.category}</span>
             </div>
+            {item.scheduledAt && (
+              <div className="detail-row">
+                <span className="detail-key">Jadwal</span>
+                <span className="detail-val">{fmtScheduled(item.scheduledAt)}</span>
+              </div>
+            )}
+            {item.city && (
+              <div className="detail-row">
+                <span className="detail-key">Kota</span>
+                <span className="detail-val">{item.city}</span>
+              </div>
+            )}
             {item.priority && (
               <div className="detail-row">
                 <span className="detail-key">Prioritas</span>
                 <span className="detail-val">{PRIO_LBL[item.priority]}</span>
-              </div>
-            )}
-            {item.priceRange && (
-              <div className="detail-row">
-                <span className="detail-key">Harga</span>
-                <span className="detail-val">{PRICE_LBL[item.priceRange]}</span>
               </div>
             )}
             {item.rating && (
@@ -76,6 +87,11 @@ export default function DetailModal({ item, mode, onClose, onVisit, onRestore, o
             </div>
           </div>
 
+          {item.photoUrl && (
+            <img src={item.photoUrl} alt={item.name}
+              style={{ width: "100%", borderRadius: 12, marginBottom: 16, objectFit: "cover", maxHeight: 200 }} />
+          )}
+
           <div className="detail-actions">
             {item.mapsUrl && (
               <a className="maps-link-btn" href={item.mapsUrl} target="_blank" rel="noreferrer">
@@ -90,6 +106,11 @@ export default function DetailModal({ item, mode, onClose, onVisit, onRestore, o
             {mode === "archive" && (
               <button className="btn btn-ghost btn-sm" onClick={() => { onRestore(item.id); onClose(); }}>
                 ↩ Kembalikan
+              </button>
+            )}
+            {onEdit && (
+              <button className="btn btn-ghost btn-sm" onClick={() => { onClose(); onEdit(item); }}>
+                ✏️ Edit
               </button>
             )}
             {!confirming ? (

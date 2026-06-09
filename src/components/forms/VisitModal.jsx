@@ -40,7 +40,7 @@ export default function VisitModal({ item, onConfirm, onClose }) {
         <button className="btn-icon modal-close" onClick={onClose}>✕</button>
         <div className="modal-title">Sudah dikunjungi! 🎉</div>
         <p className="text-sm text-muted" style={{ marginBottom: "1rem" }}>
-          {item.name} — {item.city}
+          {item.name}{item.city ? ` — ${item.city}` : ""}
         </p>
 
         <div style={{ marginBottom: "1rem" }}>
