@@ -45,6 +45,7 @@ export function useItems() {
       city: data.city.trim(),
       notes: data.notes?.trim() || "",
       priceRange: data.priceRange || null,
+      priority: data.priority || null,
       mapsUrl: data.mapsUrl?.trim() || "",
       rating: data.rating || null,
       photoUrl: data.photoUrl || "",

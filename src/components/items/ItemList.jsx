@@ -4,7 +4,7 @@ import EmptyState from "../ui/EmptyState";
 
 const PAGE = 20;
 
-export default function ItemList({ items, mode, onVisit, onRestore, onDelete, emptyState }) {
+export default function ItemList({ items, mode, onVisit, onRestore, onDelete, onCardClick, emptyState }) {
   const [count, setCount] = useState(PAGE);
 
   useEffect(() => { setCount(PAGE); }, [items]);
@@ -26,6 +26,7 @@ export default function ItemList({ items, mode, onVisit, onRestore, onDelete, em
             onVisit={onVisit}
             onRestore={onRestore}
             onDelete={onDelete}
+            onCardClick={onCardClick}
           />
         ))}
       </div>

@@ -17,6 +17,11 @@ const PRICES = [
   { value: 2, label: "$$" },
   { value: 3, label: "$$$" },
 ];
+const PRIORITIES = [
+  { value: "high", label: "🔴 Tinggi" },
+  { value: "med",  label: "🟡 Sedang" },
+  { value: "low",  label: "🟢 Rendah" },
+];
 
 export default function AddForm({ items, onAdd, onClose, showToast }) {
   const { user } = useAuth();
@@ -27,6 +32,7 @@ export default function AddForm({ items, onAdd, onClose, showToast }) {
   const [notes, setNotes]       = useState("");
   const [priceRange, setPrice]  = useState(null);
   const [mapsUrl, setMapsUrl]   = useState("");
+  const [priority, setPriority] = useState(null);
   const [rating, setRating]     = useState(null);
   const [photoFile, setPhoto]   = useState(null);
   const [photoPreview, setPreview] = useState("");
@@ -78,7 +84,7 @@ export default function AddForm({ items, onAdd, onClose, showToast }) {
         ({ photoUrl, photoPath } = await uploadPhoto(user.uid, Date.now(), photoFile));
       }
       await onAdd({
-        name, category, city, notes, priceRange, mapsUrl, rating,
+        name, category, city, notes, priceRange, priority, mapsUrl, rating,
         photoUrl, photoPath, lat, lng, placeId, address,
       });
       showToast("Tempat ditambahkan!");
@@ -130,6 +136,20 @@ export default function AddForm({ items, onAdd, onClose, showToast }) {
               className={`chip${category === c.value ? " active" : ""}`}
               onClick={() => setCategory(c.value)}>
               {c.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Prioritas */}
+      <div className="field">
+        <div className="field-label">Prioritas (opsional)</div>
+        <div className="chip-group">
+          {PRIORITIES.map((p) => (
+            <button key={p.value} type="button"
+              className={`chip${priority === p.value ? " active" : ""}`}
+              onClick={() => setPriority(priority === p.value ? null : p.value)}>
+              {p.label}
             </button>
           ))}
         </div>

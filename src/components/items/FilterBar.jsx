@@ -1,43 +1,80 @@
-const CAT_PILLS = [
-  { value: "semua",  label: "Semua" },
-  { value: "resto",  label: "🍽️ Resto" },
-  { value: "cafe",   label: "☕ Cafe" },
-  { value: "tempat", label: "📍 Tempat" },
-  { value: "hotel",  label: "🏨 Hotel" },
+const TYPE_PILLS = [
+  { value: "semua",  label: "Semua",    cls: "t-semua" },
+  { value: "resto",  label: "🍽 Resto",  cls: "t-resto" },
+  { value: "cafe",   label: "☕ Cafe",   cls: "t-cafe" },
+  { value: "tempat", label: "📍 Tempat", cls: "t-tempat" },
+  { value: "hotel",  label: "🏨 Hotel",  cls: "t-hotel" },
 ];
 
-export default function FilterBar({ items, catFilter, setCatFilter, cityFilter, setCityFilter }) {
-  const cities = ["semua", ...new Set(items.map((i) => i.city).filter(Boolean))].sort((a, b) =>
-    a === "semua" ? -1 : b === "semua" ? 1 : a.localeCompare(b)
+const SORT_OPTIONS = [
+  { value: "newest",   label: "Terbaru" },
+  { value: "oldest",   label: "Terlama" },
+  { value: "name_az",  label: "Nama A-Z" },
+  { value: "rating",   label: "Rating" },
+  { value: "priority", label: "Prioritas" },
+];
+
+export default function FilterBar({
+  items, catFilter, setCatFilter,
+  cityFilter, setCityFilter,
+  sort, setSort, totalFiltered,
+}) {
+  const cities = [...new Set(items.map((i) => i.city).filter(Boolean))].sort((a, b) =>
+    a.localeCompare(b)
   );
 
   return (
-    <>
-      {/* Category pills — horizontal scroll */}
-      <div className="cat-pills-wrap">
-        <div className="cat-pills">
-          {CAT_PILLS.map((c) => (
+    <div className="filter-bar">
+      {/* Type pills */}
+      <div className="type-pills-wrap">
+        <div className="type-pills">
+          {TYPE_PILLS.map((p) => (
             <button
-              key={c.value}
-              className={`cat-pill${catFilter === c.value ? " active" : ""}`}
-              onClick={() => setCatFilter(c.value)}
+              key={p.value}
+              className={`type-pill ${p.cls}${catFilter === p.value ? " active" : ""}`}
+              onClick={() => setCatFilter(p.value)}
             >
-              {c.label}
+              {p.label}
             </button>
           ))}
         </div>
       </div>
 
-      {/* City filter — only if more than 1 city */}
-      {cities.length > 2 && (
-        <div className="city-row">
-          <select className="input" value={cityFilter} onChange={(e) => setCityFilter(e.target.value)}>
+      {/* City chips — only if more than 1 city */}
+      {cities.length > 1 && (
+        <div className="city-chips-wrap">
+          <div className="city-chips">
+            <button
+              className={`city-chip${cityFilter === "semua" ? " active" : ""}`}
+              onClick={() => setCityFilter("semua")}
+            >
+              Semua
+            </button>
             {cities.map((c) => (
-              <option key={c} value={c}>{c === "semua" ? "Semua Kota" : c}</option>
+              <button
+                key={c}
+                className={`city-chip${cityFilter === c ? " active" : ""}`}
+                onClick={() => setCityFilter(c)}
+              >
+                {c}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Count + sort */}
+      <div className="filter-bottom-row">
+        <span className="filter-count">{totalFiltered} tempat</span>
+        <div className="sort-wrap">
+          <span className="sort-label">Urut</span>
+          <select className="sort-select" value={sort} onChange={(e) => setSort(e.target.value)}>
+            {SORT_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>{o.label}</option>
             ))}
           </select>
         </div>
-      )}
-    </>
+      </div>
+    </div>
   );
 }
