@@ -9,15 +9,14 @@ export default function TopBar({ theme, onToggleTheme }) {
   const [coffeeOpen, setCoffeeOpen] = useState(false);
 
   async function handleLogin() {
-    try {
-      await signInWithPopup(auth, new GoogleAuthProvider());
-    } catch { /* user closed popup */ }
+    try { await signInWithPopup(auth, new GoogleAuthProvider()); }
+    catch { /* user closed popup */ }
   }
 
   return (
     <>
       <header className="topbar">
-        <span className="topbar-logo text-gradient">Mau Ke Mana</span>
+        <span className="topbar-logo">Mau Ke <em>Mana</em> 🧭</span>
         <div className="topbar-actions">
           <button className="btn-icon" onClick={onToggleTheme} title="Toggle tema">
             {theme === "dark" ? "☀️" : "🌙"}
@@ -27,16 +26,8 @@ export default function TopBar({ theme, onToggleTheme }) {
           </button>
           {configValid && !authLoading && (
             user
-              ? (
-                <button className="btn btn-ghost btn-sm" onClick={() => signOut(auth)}>
-                  Keluar
-                </button>
-              )
-              : (
-                <button className="btn btn-primary btn-sm" onClick={handleLogin}>
-                  Login
-                </button>
-              )
+              ? <button className="btn btn-ghost btn-sm" onClick={() => signOut(auth)}>Keluar</button>
+              : <button className="btn btn-primary btn-sm" onClick={handleLogin}>Login</button>
           )}
         </div>
       </header>

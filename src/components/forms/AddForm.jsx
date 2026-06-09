@@ -2,6 +2,8 @@ import { useState, useRef } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { uploadPhoto } from "../../services/photoStorage";
 import { validateItem } from "../../utils/validate";
+import { gmapsValid } from "../../services/googlePlaces";
+import PlacesSearch from "./PlacesSearch";
 import StarPicker from "./StarPicker";
 
 const CATEGORIES = [
@@ -18,6 +20,7 @@ const PRICES = [
 
 export default function AddForm({ items, onAdd, onClose, showToast }) {
   const { user } = useAuth();
+
   const [name, setName]         = useState("");
   const [category, setCategory] = useState("resto");
   const [city, setCity]         = useState("");
@@ -27,9 +30,35 @@ export default function AddForm({ items, onAdd, onClose, showToast }) {
   const [rating, setRating]     = useState(null);
   const [photoFile, setPhoto]   = useState(null);
   const [photoPreview, setPreview] = useState("");
-  const [error, setError]       = useState("");
-  const [loading, setLoading]   = useState(false);
+
+  // Google Maps fields
+  const [lat, setLat]         = useState(null);
+  const [lng, setLng]         = useState(null);
+  const [placeId, setPlaceId] = useState("");
+  const [address, setAddress] = useState("");
+
+  const [error, setError]   = useState("");
+  const [loading, setLoading] = useState(false);
   const fileRef = useRef();
+
+  // Called when user picks a place from autocomplete
+  function handlePlaceSelect(details) {
+    setName(details.name);
+    setCity(details.city || city);
+    setMapsUrl(details.mapsUrl || "");
+    setLat(details.lat);
+    setLng(details.lng);
+    setPlaceId(details.placeId);
+    setAddress(details.address);
+    setError("");
+
+    // Guess category from name keywords
+    const lower = details.name.toLowerCase();
+    if (lower.includes("cafe") || lower.includes("kopi") || lower.includes("coffee")) setCategory("cafe");
+    else if (lower.includes("hotel") || lower.includes("inn") || lower.includes("resort")) setCategory("hotel");
+    else if (lower.includes("resto") || lower.includes("rumah makan") || lower.includes("warung") || lower.includes("makan")) setCategory("resto");
+    else setCategory("tempat");
+  }
 
   function handlePhoto(e) {
     const file = e.target.files?.[0];
@@ -48,7 +77,10 @@ export default function AddForm({ items, onAdd, onClose, showToast }) {
       if (photoFile && user) {
         ({ photoUrl, photoPath } = await uploadPhoto(user.uid, Date.now(), photoFile));
       }
-      await onAdd({ name, category, city, notes, priceRange, mapsUrl, rating, photoUrl, photoPath });
+      await onAdd({
+        name, category, city, notes, priceRange, mapsUrl, rating,
+        photoUrl, photoPath, lat, lng, placeId, address,
+      });
       showToast("Tempat ditambahkan!");
       onClose();
     } catch {
@@ -63,15 +95,30 @@ export default function AddForm({ items, onAdd, onClose, showToast }) {
       <div className="sheet-handle" />
       <div className="sheet-title">Tambah Tempat</div>
 
-      {/* Nama */}
+      {/* Name — Places autocomplete if key available, else manual input */}
       <div className="field">
-        <input
-          className="input input-lg"
-          placeholder="Nama tempat atau restoran *"
-          value={name}
-          onChange={(e) => { setName(e.target.value); setError(""); }}
-          autoFocus
-        />
+        {gmapsValid ? (
+          <>
+            <PlacesSearch onSelect={handlePlaceSelect} initialValue={name} />
+            {name && (
+              <input
+                className="input"
+                style={{ marginTop: ".5rem" }}
+                placeholder="Edit nama (opsional)"
+                value={name}
+                onChange={(e) => { setName(e.target.value); setError(""); }}
+              />
+            )}
+          </>
+        ) : (
+          <input
+            className="input input-lg"
+            placeholder="Nama tempat atau restoran *"
+            value={name}
+            onChange={(e) => { setName(e.target.value); setError(""); }}
+            autoFocus
+          />
+        )}
       </div>
 
       {/* Kategori chips */}
@@ -79,12 +126,9 @@ export default function AddForm({ items, onAdd, onClose, showToast }) {
         <div className="field-label">Kategori</div>
         <div className="chip-group">
           {CATEGORIES.map((c) => (
-            <button
-              key={c.value}
-              type="button"
+            <button key={c.value} type="button"
               className={`chip${category === c.value ? " active" : ""}`}
-              onClick={() => setCategory(c.value)}
-            >
+              onClick={() => setCategory(c.value)}>
               {c.label}
             </button>
           ))}
@@ -104,12 +148,9 @@ export default function AddForm({ items, onAdd, onClose, showToast }) {
         <div className="field" style={{ flexShrink: 0 }}>
           <div className="chip-group">
             {PRICES.map((p) => (
-              <button
-                key={p.value}
-                type="button"
+              <button key={p.value} type="button"
                 className={`chip chip-price${priceRange === p.value ? " active" : ""}`}
-                onClick={() => setPrice(priceRange === p.value ? null : p.value)}
-              >
+                onClick={() => setPrice(priceRange === p.value ? null : p.value)}>
                 {p.label}
               </button>
             ))}
@@ -117,24 +158,25 @@ export default function AddForm({ items, onAdd, onClose, showToast }) {
         </div>
       </div>
 
+      {/* Address dari Google (read-only hint) */}
+      {address && (
+        <div className="field">
+          <div className="field-label">Alamat</div>
+          <div className="address-hint">{address}</div>
+        </div>
+      )}
+
       {/* Catatan */}
       <div className="field">
-        <input
-          className="input"
-          placeholder="💬 Catatan (opsional)"
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-        />
+        <input className="input" placeholder="💬 Catatan (opsional)"
+          value={notes} onChange={(e) => setNotes(e.target.value)} />
       </div>
 
-      {/* Maps */}
+      {/* Maps URL */}
       <div className="field">
-        <input
-          className="input"
-          placeholder="🗺️ Link Google Maps (opsional)"
-          value={mapsUrl}
-          onChange={(e) => setMapsUrl(e.target.value)}
-        />
+        <input className="input"
+          placeholder="🗺️ Link Google Maps (opsional — otomatis jika pakai search)"
+          value={mapsUrl} onChange={(e) => setMapsUrl(e.target.value)} />
       </div>
 
       {/* Rating + Foto */}
@@ -143,26 +185,13 @@ export default function AddForm({ items, onAdd, onClose, showToast }) {
           <div className="field-label">Rating awal</div>
           <StarPicker value={rating} onChange={setRating} size="lg" />
         </div>
-
-        <label
-          className={`photo-upload-btn${photoPreview ? " has-photo" : ""}`}
-          style={{ flex: 1 }}
-          title={!user ? "Login untuk upload foto" : ""}
-        >
-          <input
-            ref={fileRef}
-            type="file"
-            accept="image/*"
-            style={{ display: "none" }}
-            onChange={handlePhoto}
-            disabled={!user}
-          />
-          {photoPreview ? (
-            <>
-              <img src={photoPreview} alt="" style={{ width: 24, height: 24, borderRadius: 4, objectFit: "cover" }} />
-              Foto dipilih
-            </>
-          ) : !user ? "🔒 Login untuk foto" : "📷 Foto"}
+        <label className={`photo-upload-btn${photoPreview ? " has-photo" : ""}`} style={{ flex: 1 }}
+          title={!user ? "Login untuk upload foto" : ""}>
+          <input ref={fileRef} type="file" accept="image/*" style={{ display: "none" }}
+            onChange={handlePhoto} disabled={!user} />
+          {photoPreview
+            ? <><img src={photoPreview} alt="" style={{ width: 24, height: 24, borderRadius: 4, objectFit: "cover" }} /> Foto dipilih</>
+            : !user ? "🔒 Login untuk foto" : "📷 Foto"}
         </label>
       </div>
 

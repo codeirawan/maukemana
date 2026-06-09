@@ -1,13 +1,28 @@
 import { useState } from "react";
 import StarPicker from "../forms/StarPicker";
 import PhotoViewer from "../ui/PhotoViewer";
+import { staticMapUrl } from "../../services/googlePlaces";
 
-const CATEGORY_EMOJI = { resto: "🍽️", cafe: "☕", tempat: "📍", hotel: "🏨" };
-const PRICE_LABELS   = { 1: "$", 2: "$$", 3: "$$$" };
+const CAT_EMOJI = { resto: "🍽️", cafe: "☕", tempat: "📍", hotel: "🏨" };
+const CAT_BG    = {
+  resto:   "var(--cat-bg-resto)",
+  cafe:    "var(--cat-bg-cafe)",
+  tempat:  "var(--cat-bg-tempat)",
+  hotel:   "var(--cat-bg-hotel)",
+};
+const CAT_BADGE = {
+  resto:   "badge-resto",
+  cafe:    "badge-cafe",
+  tempat:  "badge-tempat",
+  hotel:   "badge-hotel",
+};
+const PRICE_LABELS = { 1: "$", 2: "$$", 3: "$$$" };
 
 export default function ItemRow({ item, mode, onVisit, onRestore, onDelete }) {
   const [confirming, setConfirming] = useState(false);
   const [viewPhoto, setViewPhoto]   = useState(false);
+
+  const mapThumb = !item.photoUrl ? staticMapUrl(item.lat, item.lng) : null;
 
   return (
     <>
@@ -15,12 +30,20 @@ export default function ItemRow({ item, mode, onVisit, onRestore, onDelete }) {
         {/* Thumbnail */}
         <div
           className="item-thumb"
+          style={{ background: (!item.photoUrl && !mapThumb) ? (CAT_BG[item.category] ?? "var(--cat-bg-default)") : undefined }}
           onClick={() => item.photoUrl && setViewPhoto(true)}
-          style={{ cursor: item.photoUrl ? "zoom-in" : "default" }}
+          style={{
+            background: (!item.photoUrl && !mapThumb) ? (CAT_BG[item.category] ?? "var(--cat-bg-default)") : undefined,
+            cursor: item.photoUrl ? "zoom-in" : "default",
+          }}
         >
-          {item.photoUrl
-            ? <img src={item.photoUrl} alt={item.name} />
-            : <span>{CATEGORY_EMOJI[item.category] ?? "📌"}</span>}
+          {item.photoUrl ? (
+            <img src={item.photoUrl} alt={item.name} />
+          ) : mapThumb ? (
+            <img src={mapThumb} alt="" className="item-thumb-map" />
+          ) : (
+            <div className="item-thumb-placeholder">{CAT_EMOJI[item.category] ?? "📌"}</div>
+          )}
         </div>
 
         {/* Body */}
@@ -28,18 +51,16 @@ export default function ItemRow({ item, mode, onVisit, onRestore, onDelete }) {
           <div className="item-name">{item.name}</div>
 
           <div className="item-meta">
-            <span className="item-cat-badge">{CATEGORY_EMOJI[item.category]} {item.category}</span>
+            <span className={`item-cat-badge ${CAT_BADGE[item.category] ?? "badge-default"}`}>
+              {CAT_EMOJI[item.category]} {item.category}
+            </span>
             <span className="item-city">📍 {item.city}</span>
             {item.priceRange && (
               <span className="item-price">{PRICE_LABELS[item.priceRange]}</span>
             )}
           </div>
 
-          {item.rating && (
-            <div style={{ marginTop: ".25rem" }}>
-              <StarPicker value={item.rating} onChange={() => {}} readonly />
-            </div>
-          )}
+          {item.rating && <StarPicker value={item.rating} onChange={() => {}} readonly />}
 
           {item.notes && <div className="item-notes">"{item.notes}"</div>}
 
@@ -51,7 +72,9 @@ export default function ItemRow({ item, mode, onVisit, onRestore, onDelete }) {
             )}
             {mode === "archive" && item.visitedAt && (
               <span className="visited-date">
-                ✅ {new Date(item.visitedAt).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })}
+                ✅ {new Date(item.visitedAt).toLocaleDateString("id-ID", {
+                  day: "numeric", month: "short", year: "numeric",
+                })}
               </span>
             )}
           </div>
@@ -60,9 +83,7 @@ export default function ItemRow({ item, mode, onVisit, onRestore, onDelete }) {
         {/* Actions */}
         <div className="item-actions">
           {mode === "wishlist" && (
-            <button className="btn-sudah" onClick={() => onVisit(item)}>
-              Sudah!
-            </button>
+            <button className="btn-sudah" onClick={() => onVisit(item)}>Sudah!</button>
           )}
 
           {mode === "archive" && !confirming && (
