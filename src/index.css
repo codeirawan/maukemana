@@ -262,8 +262,8 @@ input[type="datetime-local"].input { color-scheme: light; }
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 2px;
-  width: calc(100% + 2.5rem);
-  margin-left: -1.25rem;
+  width: calc(100% + 32px);
+  margin-left: -16px;
   overflow: hidden;
 }
 .archive-cell {
