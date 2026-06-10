@@ -405,7 +405,6 @@ input[type="datetime-local"].input { color-scheme: light; }
   position: fixed; inset: 0; background: rgba(0,0,0,.6);
   backdrop-filter: blur(6px); z-index: 500; animation: fadeIn .2s ease;
   display: flex; align-items: flex-end; justify-content: center;
-  padding-bottom: max(16px, env(safe-area-inset-bottom));
 }
 .bottom-sheet {
   background: linear-gradient(170deg, #FFF8ED 0%, #FFFDF9 60%, #FFF9F0 100%);
@@ -413,6 +412,7 @@ input[type="datetime-local"].input { color-scheme: light; }
   padding: 0 1.25rem 2rem;
   width: calc(100% - 48px); max-width: 420px;
   max-height: calc(100dvh - 24px); overflow-y: auto;
+  margin-bottom: max(16px, env(safe-area-inset-bottom));
   animation: sheetUp .28s cubic-bezier(.32,.72,0,1);
   border: 1px solid rgba(217,119,6,.15);
 }
@@ -425,8 +425,9 @@ input[type="datetime-local"].input { color-scheme: light; }
 
 /* Desktop: centered modal */
 @media (min-width: 600px) {
-  .sheet-overlay { align-items: center; padding-bottom: 0; }
+  .sheet-overlay { align-items: center; }
   .bottom-sheet {
+    margin-bottom: 0;
     border-radius: 20px; max-width: 420px; border: 1px solid rgba(217,119,6,.15);
     animation: modalIn .22s cubic-bezier(.32,.72,0,1);
     max-height: 88vh;
