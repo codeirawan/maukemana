@@ -164,7 +164,7 @@ input[type="datetime-local"].input { color-scheme: light; }
 
 .type-pills-wrap {
   overflow-x: auto; -webkit-overflow-scrolling: touch;
-  scrollbar-width: none; margin: 0 -16px; padding: 0 16px 8px;
+  scrollbar-width: none; margin: 0 -16px; padding: 4px 16px 8px;
 }
 .type-pills-wrap::-webkit-scrollbar { display: none; }
 .type-pills { display: flex; gap: 6px; width: max-content; }
