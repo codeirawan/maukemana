@@ -12,7 +12,7 @@
 
 ### Plans (Wishlist)
 - Tambah tempat dengan nama, kategori, catatan, prioritas, jadwal kunjungan, link Google Maps
-- Autocomplete nama tempat via Google Places API (opsional)
+- Autocomplete nama tempat via Nominatim (OpenStreetMap, gratis)
 - Filter berdasarkan kategori, kota, dan pencarian teks
 - Sort: terbaru, terlama, nama A–Z, prioritas
 - Tandai sebagai "Sudah Dikunjungi" — pindah ke Memories beserta rating & foto
@@ -51,8 +51,7 @@
 | Auth | Firebase Authentication (Google OAuth) |
 | Database | Cloud Firestore (offline persistence) |
 | Storage foto | Cloudinary (unsigned upload) |
-| Places search | Google Places API (New) |
-| Static map | Google Maps Static API |
+| Places search | Nominatim (OpenStreetMap) — gratis, tanpa API key |
 | Deploy | Vercel |
 | Font | Inter (body), Satisfy (dekoratif) |
 
@@ -155,9 +154,6 @@ VITE_FIREBASE_APP_ID=
 # Cloudinary
 VITE_CLOUDINARY_CLOUD_NAME=
 VITE_CLOUDINARY_UPLOAD_PRESET=
-
-# Google Maps (opsional — fitur Places & Static Map)
-VITE_GOOGLE_MAPS_API_KEY=
 ```
 
 ### 3. Firebase Setup
@@ -184,15 +180,7 @@ service cloud.firestore {
 2. Buat **Upload Preset** dengan mode `unsigned`
 3. Isi `VITE_CLOUDINARY_CLOUD_NAME` dan `VITE_CLOUDINARY_UPLOAD_PRESET`
 
-### 5. Google Maps (Opsional)
-
-1. Aktifkan **Places API (New)** dan **Maps Static API** di Google Cloud Console
-2. Restrict API key ke domain kamu
-3. Isi `VITE_GOOGLE_MAPS_API_KEY`
-
-Tanpa key ini, app tetap berfungsi — input nama jadi manual, peta tidak muncul.
-
-### 6. Run
+### 5. Run
 
 ```bash
 npm run dev
@@ -251,4 +239,4 @@ Sebelum upload ke Cloudinary, gambar di-resize di browser menggunakan Canvas API
 
 - **Foto tidak terhapus dari Cloudinary** saat item dihapus — delete membutuhkan API secret yang tidak aman disimpan di frontend. Untuk cleanup, hapus manual via Cloudinary dashboard.
 - **Limit 500 item** per user (Firestore query limit — cukup untuk pemakaian personal).
-- **Google Places quota** terbatas pada free tier — jika habis, input nama jadi manual.
+- **Nominatim rate limit** max 1 req/detik — ada debounce 500ms di PlacesSearch.
