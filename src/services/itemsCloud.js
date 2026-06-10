@@ -14,6 +14,8 @@ export function subscribeItems(uid, callback) {
     const data = snap.docs.map((d) => d.data());
     data.sort((a, b) => b.addedAt.localeCompare(a.addedAt) || b.id - a.id);
     callback(data);
+  }, (err) => {
+    console.error("subscribeItems error:", err.code, err.message);
   });
 }
 

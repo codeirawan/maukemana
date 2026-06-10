@@ -105,7 +105,8 @@ export default function AddForm({ items, onAdd, editItem, onUpdate, onClose, sho
         showToast("Ditambahkan ke itinerary!");
       }
       onClose();
-    } catch {
+    } catch (e) {
+      console.error("AddForm error:", e);
       setError("Gagal menyimpan, coba lagi.");
     } finally {
       setLoading(false);

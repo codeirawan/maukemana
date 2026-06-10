@@ -57,13 +57,21 @@ export function ItemsProvider({ children }) {
       visitedAt: null,
       archived: false,
     };
-    if (user) { await cloudAdd(user.uid, item); }
-    else { localAdd(item); syncLocal(); }
+    if (user) {
+      setCloudItems(prev => [item, ...prev]);
+      await cloudAdd(user.uid, item);
+    } else {
+      localAdd(item); syncLocal();
+    }
   }
 
   async function updateItem(id, patch) {
-    if (user) { await cloudUpdate(user.uid, id, patch); }
-    else { localUpdate(id, patch); syncLocal(); }
+    if (user) {
+      setCloudItems(prev => prev.map(i => i.id === id ? { ...i, ...patch } : i));
+      await cloudUpdate(user.uid, id, patch);
+    } else {
+      localUpdate(id, patch); syncLocal();
+    }
   }
 
   async function markVisited(id, { rating, photoUrl, photoPath }) {
@@ -81,8 +89,12 @@ export function ItemsProvider({ children }) {
 
   async function deleteItem(id, photoPath) {
     if (photoPath) await deletePhoto(photoPath);
-    if (user) { await cloudDelete(user.uid, id); }
-    else { localDelete(id); syncLocal(); }
+    if (user) {
+      setCloudItems(prev => prev.filter(i => i.id !== id));
+      await cloudDelete(user.uid, id);
+    } else {
+      localDelete(id); syncLocal();
+    }
   }
 
   return (
