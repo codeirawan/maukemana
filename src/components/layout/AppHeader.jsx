@@ -3,6 +3,7 @@ import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
 import { auth, configValid } from "../../firebase";
 import { useAuth } from "../../context/AuthContext";
 import CoffeeModal from "../ui/CoffeeModal";
+import InfoModal from "../ui/InfoModal";
 import { IconSun, IconMoon, IconUser } from "../ui/Icons";
 
 const GoogleIcon = () => (
@@ -17,6 +18,7 @@ const GoogleIcon = () => (
 export default function AppHeader({ dark, onToggle }) {
   const { user, authLoading } = useAuth();
   const [coffeeOpen, setCoffeeOpen] = useState(false);
+  const [infoOpen, setInfoOpen]     = useState(false);
 
   const btnStyle = {
     background: dark ? "rgba(255,255,255,.08)" : "rgba(0,0,0,.06)",
@@ -38,6 +40,10 @@ export default function AppHeader({ dark, onToggle }) {
           <div className="app-header-title">Mau Ke <span>Mana</span></div>
         </div>
         <div className="app-header-actions">
+          <button onClick={() => setInfoOpen(true)} title="Tentang Aplikasi"
+            style={{ ...btnStyle, fontWeight: 800, fontSize: 14, minWidth: 32 }}>
+            ?
+          </button>
           <button onClick={() => setCoffeeOpen(true)} title="Support Developer"
             style={{ ...btnStyle, fontWeight: 800, fontSize: 15, letterSpacing: "-.5px", minWidth: 34 }}>
             $
@@ -65,6 +71,7 @@ export default function AppHeader({ dark, onToggle }) {
         </div>
       </div>
       {coffeeOpen && <CoffeeModal onClose={() => setCoffeeOpen(false)} />}
+      {infoOpen   && <InfoModal  onClose={() => setInfoOpen(false)} />}
     </>
   );
 }
