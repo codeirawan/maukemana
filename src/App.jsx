@@ -9,6 +9,7 @@ import ArchivePage from "./pages/ArchivePage";
 import AddForm from "./components/forms/AddForm";
 import Toast from "./components/ui/Toast";
 import MaintenancePage from "./components/ui/MaintenancePage";
+import ErrorBoundary from "./components/ui/ErrorBoundary";
 
 const RencanaIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -86,13 +87,13 @@ function AppShell() {
 
       <nav className="nav">
         <button className="nav-item" onClick={() => setTab("wishlist")}
-          style={{ color: tab === "wishlist" ? "#D97706" : "var(--dim)" }}>
+          style={{ color: tab === "wishlist" ? "#D97706" : "var(--dim)", justifySelf: "center" }}>
           <span className="nav-item-icon"><RencanaIcon /></span>
           <span className={tab === "wishlist" ? "nav-label-active" : "nav-label"}>Plans</span>
         </button>
         <button className="nav-fab" onClick={() => setShowForm(true)}>+</button>
         <button className="nav-item" onClick={() => setTab("archive")}
-          style={{ color: tab === "archive" ? "#D97706" : "var(--dim)" }}>
+          style={{ color: tab === "archive" ? "#D97706" : "var(--dim)", justifySelf: "center" }}>
           <span className="nav-item-icon"><SudahIcon /></span>
           <span className={tab === "archive" ? "nav-label-active" : "nav-label"}>Memories</span>
         </button>
@@ -121,10 +122,12 @@ function AppShell() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <ItemsProvider>
-        <AppShell />
-      </ItemsProvider>
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <ItemsProvider>
+          <AppShell />
+        </ItemsProvider>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }

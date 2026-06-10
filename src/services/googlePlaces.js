@@ -10,11 +10,15 @@ export async function searchPlaces(input) {
       body: JSON.stringify({ input, languageCode: "id" }),
     });
     const data = await res.json();
-    return (data.suggestions || []).map((s) => ({
-      placeId: s.placePrediction.placeId,
-      mainText: s.placePrediction.structuredFormat.mainText.text,
-      secondaryText: s.placePrediction.structuredFormat.secondaryText?.text || "",
-    }));
+    return (data.suggestions || []).flatMap((s) => {
+      const p = s.placePrediction;
+      if (!p?.structuredFormat?.mainText?.text) return [];
+      return [{
+        placeId: p.placeId,
+        mainText: p.structuredFormat.mainText.text,
+        secondaryText: p.structuredFormat.secondaryText?.text || "",
+      }];
+    });
   } catch { return []; }
 }
 

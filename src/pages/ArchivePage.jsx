@@ -25,7 +25,7 @@ export default function ArchivePage({ showToast, onEditItem }) {
   const [sort, setSort]             = useState("newest");
   const [selectedItem, setSelected] = useState(null);
 
-  const archive = items.filter(i => i.archived);
+  const archive = useMemo(() => items.filter(i => i.archived), [items]);
 
   const filtered = useMemo(() => {
     let arr = archive;
@@ -44,12 +44,12 @@ export default function ArchivePage({ showToast, onEditItem }) {
 
   async function handleRestore(id) {
     await restoreItem(id);
-    showToast("Dipindahkan kembali ke rencana");
+    showToast("Dipindahkan kembali ke rencana!");
   }
 
   async function handleDelete(id, photoPath) {
     await deleteItem(id, photoPath);
-    showToast("Dihapus");
+    showToast("Tempat berhasil dihapus!");
   }
 
   return (

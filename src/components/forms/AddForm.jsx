@@ -59,7 +59,8 @@ export default function AddForm({ items, onAdd, editItem, onUpdate, onClose, sho
 
   const [error, setError]     = useState("");
   const [loading, setLoading] = useState(false);
-  const fileRef = useRef();
+  const fileRef    = useRef();
+  const submitting = useRef(false);
 
   const scheduledAt = schedDate ? `${schedDate}T${schedTime}` : null;
 
@@ -85,8 +86,10 @@ export default function AddForm({ items, onAdd, editItem, onUpdate, onClose, sho
 
   async function handleSubmit(e) {
     e.preventDefault();
+    if (submitting.current) return;
     const err = validateItem({ name, category }, items, isEdit ? editItem.id : null);
     if (err) { setError(err); return; }
+    submitting.current = true;
     setLoading(true);
     try {
       if (isEdit) {
@@ -108,6 +111,7 @@ export default function AddForm({ items, onAdd, editItem, onUpdate, onClose, sho
     } catch (e) {
       console.error("AddForm error:", e);
       setError("Gagal menyimpan, coba lagi.");
+      submitting.current = false;
     } finally {
       setLoading(false);
     }

@@ -103,7 +103,7 @@ export default function DetailModal({ item, mode, onClose, onVisit, onRestore, o
 
         {/* Actions */}
         <div className="detail-actions">
-          {item.mapsUrl && (
+          {item.mapsUrl?.startsWith("https://") && (
             <a className="maps-link-btn" href={item.mapsUrl} target="_blank" rel="noreferrer">
               <IconMap size={13} /> Lihat Peta
             </a>

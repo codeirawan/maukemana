@@ -67,8 +67,14 @@ export function ItemsProvider({ children }) {
 
   async function updateItem(id, patch) {
     if (user) {
+      const snapshot = cloudItems.find(i => i.id === id);
       setCloudItems(prev => prev.map(i => i.id === id ? { ...i, ...patch } : i));
-      await cloudUpdate(user.uid, id, patch);
+      try {
+        await cloudUpdate(user.uid, id, patch);
+      } catch (err) {
+        if (snapshot) setCloudItems(prev => prev.map(i => i.id === id ? snapshot : i));
+        throw err;
+      }
     } else {
       localUpdate(id, patch); syncLocal();
     }
@@ -90,8 +96,14 @@ export function ItemsProvider({ children }) {
   async function deleteItem(id, photoPath) {
     if (photoPath) await deletePhoto(photoPath);
     if (user) {
+      const snapshot = cloudItems.find(i => i.id === id);
       setCloudItems(prev => prev.filter(i => i.id !== id));
-      await cloudDelete(user.uid, id);
+      try {
+        await cloudDelete(user.uid, id);
+      } catch (err) {
+        if (snapshot) setCloudItems(prev => [snapshot, ...prev.filter(i => i.id !== id)]);
+        throw err;
+      }
     } else {
       localDelete(id); syncLocal();
     }

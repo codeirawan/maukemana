@@ -27,7 +27,7 @@ export default function WishlistPage({ showToast, onEditItem }) {
   const [search, setSearch]          = useState("");
   const [sort, setSort]              = useState("newest");
 
-  const wishlist = items.filter(i => !i.archived);
+  const wishlist = useMemo(() => items.filter(i => !i.archived), [items]);
 
   const filtered = useMemo(() => {
     let arr = wishlist;
@@ -47,7 +47,7 @@ export default function WishlistPage({ showToast, onEditItem }) {
   async function handleVisitConfirm({ rating, photoUrl, photoPath }) {
     await markVisited(visitingItem.id, { rating, photoUrl, photoPath });
     setVisiting(null);
-    showToast("Ditandai sudah dikunjungi! 🎉");
+    showToast("Ditandai sudah dikunjungi!");
   }
 
   return (
@@ -99,7 +99,7 @@ export default function WishlistPage({ showToast, onEditItem }) {
           onDelete={async (id, path) => {
             await deleteItem(id, path);
             setSelected(null);
-            showToast("Dihapus");
+            showToast("Tempat berhasil dihapus!");
           }}
         />
       )}

@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { uploadPhoto } from "../../services/photoStorage";
 import StarPicker from "./StarPicker";
@@ -10,7 +10,9 @@ export default function VisitModal({ item, onConfirm, onClose }) {
   const [photoFile, setPhotoFile]       = useState(null);
   const [photoPreview, setPhotoPreview] = useState(item.photoUrl || "");
   const [loading, setLoading]           = useState(false);
-  const fileRef = useRef();
+  const [error, setError]               = useState("");
+  const fileRef  = useRef();
+  const submitting = useRef(false);
 
   function handlePhoto(e) {
     const file = e.target.files?.[0];
@@ -20,16 +22,24 @@ export default function VisitModal({ item, onConfirm, onClose }) {
   }
 
   async function handleConfirm() {
+    if (submitting.current) return;
+    submitting.current = true;
     setLoading(true);
+    setError("");
     try {
       let photoUrl = item.photoUrl || "";
       let photoPath = item.photoPath || "";
       if (photoFile && user) {
-        ({ photoUrl, photoPath } = await uploadPhoto(user.uid, item.id, photoFile));
+        try {
+          ({ photoUrl, photoPath } = await uploadPhoto(user.uid, item.id, photoFile));
+        } catch {
+          setError("Foto gagal diupload — kunjungan disimpan tanpa foto.");
+        }
       }
       await onConfirm({ rating, photoUrl, photoPath });
     } catch {
-      // silent
+      setError("Gagal menyimpan, coba lagi.");
+      submitting.current = false;
     } finally {
       setLoading(false);
     }
@@ -68,6 +78,8 @@ export default function VisitModal({ item, onConfirm, onClose }) {
           }
         </label>
       </div>
+
+      {error && <div className="form-error">{error}</div>}
 
       <div className="sheet-actions">
         <button className="btn btn-primary" style={{ width: "100%" }}
