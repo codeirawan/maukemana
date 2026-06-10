@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { searchPlaces, getPlaceDetails } from "../../services/googlePlaces";
+import { IconMapPin } from "../ui/Icons";
 
 export default function PlacesSearch({ onSelect, initialValue = "" }) {
   const [query, setQuery]           = useState(initialValue);
@@ -61,7 +62,7 @@ export default function PlacesSearch({ onSelect, initialValue = "" }) {
         <div className="places-dropdown">
           {suggestions.map((s) => (
             <button key={s.placeId} type="button" className="places-item" onClick={() => handleSelect(s)}>
-              <span className="places-main">📍 {s.mainText}</span>
+              <span className="places-main"><span style={{ color: "var(--accent)", display: "inline-flex", flexShrink: 0 }}><IconMapPin size={13} /></span> {s.mainText}</span>
               {s.secondaryText && <span className="places-sub">{s.secondaryText}</span>}
             </button>
           ))}
