@@ -5,7 +5,10 @@ import { validateItem } from "../../utils/validate";
 import { gmapsValid } from "../../services/googlePlaces";
 import PlacesSearch from "./PlacesSearch";
 import StarPicker from "./StarPicker";
-import { IconUtensils, IconCoffee, IconMapPin, IconBuilding, IconCamera, IconLock, IconMap, IconMessage } from "../ui/Icons";
+import {
+  IconUtensils, IconCoffee, IconMapPin, IconBuilding,
+  IconCamera, IconLock, IconMap, IconMessage, IconCalendar, IconClock, IconX,
+} from "../ui/Icons";
 
 const CATEGORIES = [
   { value: "resto",  label: "Resto",  Icon: IconUtensils },
@@ -19,30 +22,36 @@ const PRIORITIES = [
   { value: "low",  label: "Rendah", dot: "#86EFAC" },
 ];
 
-function defaultScheduledAt() {
+function parseDateTime(iso) {
+  if (!iso) return { date: "", time: "12:00" };
+  const [d, t] = iso.split("T");
+  return { date: d || "", time: t?.slice(0, 5) || "12:00" };
+}
+
+function defaultDate() {
   const d = new Date();
   d.setDate(d.getDate() + 7);
-  d.setHours(12, 0, 0, 0);
-  return d.toISOString().slice(0, 16);
+  return d.toISOString().slice(0, 10);
 }
 
 export default function AddForm({ items, onAdd, editItem, onUpdate, onClose, showToast }) {
   const { user } = useAuth();
   const isEdit = !!editItem;
 
+  const initDT = parseDateTime(editItem?.scheduledAt);
+
   const [name, setName]             = useState(editItem?.name || "");
   const [category, setCategory]     = useState(editItem?.category || "resto");
   const [notes, setNotes]           = useState(editItem?.notes || "");
   const [mapsUrl, setMapsUrl]       = useState(editItem?.mapsUrl || "");
   const [priority, setPriority]     = useState(editItem?.priority || null);
-  const [scheduledAt, setScheduled] = useState(editItem?.scheduledAt || defaultScheduledAt());
+  const [schedDate, setSchedDate]   = useState(initDT.date || defaultDate());
+  const [schedTime, setSchedTime]   = useState(initDT.time || "12:00");
 
-  // Edit-only fields
   const [rating, setRating]         = useState(editItem?.rating || null);
   const [photoFile, setPhoto]       = useState(null);
   const [photoPreview, setPreview]  = useState(editItem?.photoUrl || "");
 
-  // Google Maps
   const [lat, setLat]         = useState(editItem?.lat || null);
   const [lng, setLng]         = useState(editItem?.lng || null);
   const [placeId, setPlaceId] = useState(editItem?.placeId || "");
@@ -52,15 +61,14 @@ export default function AddForm({ items, onAdd, editItem, onUpdate, onClose, sho
   const [loading, setLoading] = useState(false);
   const fileRef = useRef();
 
+  const scheduledAt = schedDate ? `${schedDate}T${schedTime}` : null;
+
   function handlePlaceSelect(details) {
     setName(details.name);
     setMapsUrl(details.mapsUrl || "");
-    setLat(details.lat);
-    setLng(details.lng);
-    setPlaceId(details.placeId);
-    setAddress(details.address);
+    setLat(details.lat); setLng(details.lng);
+    setPlaceId(details.placeId); setAddress(details.address);
     setError("");
-
     const lower = details.name.toLowerCase();
     if (lower.includes("cafe") || lower.includes("kopi") || lower.includes("coffee")) setCategory("cafe");
     else if (lower.includes("hotel") || lower.includes("inn") || lower.includes("resort")) setCategory("hotel");
@@ -106,32 +114,32 @@ export default function AddForm({ items, onAdd, editItem, onUpdate, onClose, sho
 
   return (
     <form onSubmit={handleSubmit}>
-      <div className="sheet-handle" />
-      <div className="sheet-title">{isEdit ? "Edit Tempat" : "Tambah ke Itinerary"}</div>
+      {/* Header */}
+      <div className="sheet-head">
+        <div className="sheet-handle" />
+        <div className="sheet-title">{isEdit ? "Edit Tempat" : "Tambah ke Itinerary"}</div>
+        <button className="sheet-close" type="button" onClick={onClose}>
+          <IconX size={16} />
+        </button>
+      </div>
 
-      {/* Name */}
+      {/* Nama */}
       <div className="field">
         {gmapsValid && !isEdit ? (
           <>
             <PlacesSearch onSelect={handlePlaceSelect} initialValue={name} />
             {name && (
-              <input
-                className="input"
-                style={{ marginTop: ".5rem" }}
-                placeholder="Edit nama (opsional)"
-                value={name}
-                onChange={(e) => { setName(e.target.value); setError(""); }}
-              />
+              <input className="input" style={{ marginTop: ".5rem" }}
+                placeholder="Edit nama (opsional)" value={name}
+                onChange={(e) => { setName(e.target.value); setError(""); }} />
             )}
           </>
         ) : (
-          <input
-            className="input input-lg"
+          <input className="input input-lg"
             placeholder="Nama tempat atau restoran *"
             value={name}
             onChange={(e) => { setName(e.target.value); setError(""); }}
-            autoFocus={!isEdit}
-          />
+            autoFocus={!isEdit} />
         )}
       </div>
 
@@ -142,8 +150,7 @@ export default function AddForm({ items, onAdd, editItem, onUpdate, onClose, sho
           {CATEGORIES.map((c) => (
             <button key={c.value} type="button"
               className={`chip${category === c.value ? " active" : ""}`}
-              onClick={() => setCategory(c.value)}
->
+              onClick={() => setCategory(c.value)}>
               <c.Icon size={12} />{c.label}
             </button>
           ))}
@@ -157,8 +164,7 @@ export default function AddForm({ items, onAdd, editItem, onUpdate, onClose, sho
           {PRIORITIES.map((p) => (
             <button key={p.value} type="button"
               className={`chip${priority === p.value ? " active" : ""}`}
-              onClick={() => setPriority(priority === p.value ? null : p.value)}
->
+              onClick={() => setPriority(priority === p.value ? null : p.value)}>
               <span style={{ width: 8, height: 8, borderRadius: "50%", background: p.dot, flexShrink: 0 }} />
               {p.label}
             </button>
@@ -166,18 +172,27 @@ export default function AddForm({ items, onAdd, editItem, onUpdate, onClose, sho
         </div>
       </div>
 
-      {/* Tanggal & Jam */}
-      <div className="field">
-        <div className="field-label">Tanggal &amp; Jam Rencana</div>
-        <input
-          type="datetime-local"
-          className="input"
-          value={scheduledAt}
-          onChange={(e) => setScheduled(e.target.value)}
-        />
+      {/* Tanggal + Jam */}
+      <div className="field-row">
+        <div className="field" style={{ flex: 1 }}>
+          <div className="field-label">Tanggal Rencana</div>
+          <div className="input-icon-wrap">
+            <IconCalendar size={14} />
+            <input type="date" className="input input-with-icon"
+              value={schedDate} onChange={(e) => setSchedDate(e.target.value)} />
+          </div>
+        </div>
+        <div className="field" style={{ width: 110, flexShrink: 0 }}>
+          <div className="field-label">Jam</div>
+          <div className="input-icon-wrap">
+            <IconClock size={14} />
+            <input type="time" className="input input-with-icon"
+              value={schedTime} onChange={(e) => setSchedTime(e.target.value)} />
+          </div>
+        </div>
       </div>
 
-      {/* Address dari Google (read-only) */}
+      {/* Alamat dari Google */}
       {address && (
         <div className="field">
           <div className="field-label">Alamat</div>
@@ -227,8 +242,7 @@ export default function AddForm({ items, onAdd, editItem, onUpdate, onClose, sho
       {error && <div className="form-error">{error}</div>}
 
       <div className="sheet-actions">
-        <button type="button" className="btn btn-ghost" onClick={onClose}>Batal</button>
-        <button type="submit" className="btn btn-primary" style={{ flex: 1 }} disabled={loading}>
+        <button type="submit" className="btn btn-primary" style={{ width: "100%" }} disabled={loading}>
           {loading ? "Menyimpan..." : isEdit ? "Simpan Perubahan" : "Simpan Tempat"}
         </button>
       </div>
