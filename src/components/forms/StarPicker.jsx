@@ -8,7 +8,7 @@ export default function StarPicker({ value, onChange, readonly = false, size }) 
       {[1, 2, 3, 4, 5].map((n) => (
         <span
           key={n}
-          className={`star${size === "lg" ? " lg" : ""}${(hovered || value) >= n ? " filled" : " empty"}${readonly ? " readonly" : ""}`}
+          className={`star${size === "lg" ? " lg" : size === "xs" ? " xs" : ""}${(hovered || value) >= n ? " filled" : " empty"}${readonly ? " readonly" : ""}`}
           onClick={() => !readonly && onChange(value === n ? null : n)}
           onMouseEnter={() => !readonly && setHovered(n)}
           onMouseLeave={() => !readonly && setHovered(0)}

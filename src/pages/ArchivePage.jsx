@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { useItems } from "../context/ItemsContext";
 import FilterBar from "../components/items/FilterBar";
-import ItemList from "../components/items/ItemList";
+import ArchiveGrid from "../components/items/ArchiveGrid";
 import DetailModal from "../components/ui/DetailModal";
 import { IconSearchX, IconCheck } from "../components/ui/Icons";
 
@@ -14,7 +14,7 @@ function sortItems(arr, sort) {
     const order = { high: 0, med: 1, low: 2 };
     return copy.sort((a, b) => (order[a.priority] ?? 3) - (order[b.priority] ?? 3));
   }
-  return copy.sort((a, b) => (b.addedAt || "").localeCompare(a.addedAt || ""));
+  return copy.sort((a, b) => (b.visitedAt || b.addedAt || "").localeCompare(a.visitedAt || a.addedAt || ""));
 }
 
 export default function ArchivePage({ showToast, onEditItem }) {
@@ -73,9 +73,8 @@ export default function ArchivePage({ showToast, onEditItem }) {
         />
       )}
 
-      <ItemList
-        items={filtered} mode="archive"
-        onVisit={() => {}} onRestore={handleRestore} onDelete={handleDelete}
+      <ArchiveGrid
+        items={filtered}
         onCardClick={setSelected}
         emptyState={
           search || catFilter !== "semua" || cityFilter !== "semua"
