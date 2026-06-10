@@ -133,17 +133,21 @@ export default function AddForm({ items, onAdd, editItem, onUpdate, onClose, sho
       {/* Nama */}
       <div className="field">
         {gmapsValid && !isEdit ? (
-          <>
+          placeSelected ? (
+            <div style={{ position: "relative" }}>
+              <input className="input input-lg" autoFocus
+                placeholder="Nama tempat *" value={name} maxLength={50}
+                onChange={(e) => { setName(e.target.value); setError(""); }} />
+              {name.length > 0 && <span className="char-count">{name.length}/50</span>}
+              <button type="button" onClick={() => { setPlaceSelected(false); setName(""); }}
+                style={{ position: "absolute", right: "2.2rem", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", padding: 4, color: "var(--text-muted)", lineHeight: 1 }}
+                title="Cari lagi">
+                <IconX size={14} />
+              </button>
+            </div>
+          ) : (
             <PlacesSearch onSelect={handlePlaceSelect} initialValue={name} />
-            {placeSelected && (
-              <div style={{ position: "relative" }}>
-                <input className="input" style={{ marginTop: ".5rem" }}
-                  placeholder="Edit nama (opsional)" value={name} maxLength={50}
-                  onChange={(e) => { setName(e.target.value); setError(""); }} />
-                <span className="char-count">{name.length}/50</span>
-              </div>
-            )}
-          </>
+          )
         ) : (
           <div style={{ position: "relative" }}>
             <input className="input input-lg"
