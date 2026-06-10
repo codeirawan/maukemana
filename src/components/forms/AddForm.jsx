@@ -57,6 +57,7 @@ export default function AddForm({ items, onAdd, editItem, onUpdate, onClose, sho
   const [placeId, setPlaceId] = useState(editItem?.placeId || "");
   const [address, setAddress] = useState(editItem?.address || "");
 
+  const [placeSelected, setPlaceSelected] = useState(false);
   const [error, setError]     = useState("");
   const [loading, setLoading] = useState(false);
   const fileRef    = useRef();
@@ -66,6 +67,7 @@ export default function AddForm({ items, onAdd, editItem, onUpdate, onClose, sho
 
   function handlePlaceSelect(details) {
     setName(details.name);
+    setPlaceSelected(true);
     setMapsUrl(details.mapsUrl || "");
     setLat(details.lat); setLng(details.lng);
     setPlaceId(details.placeId); setAddress(details.address);
@@ -133,7 +135,7 @@ export default function AddForm({ items, onAdd, editItem, onUpdate, onClose, sho
         {gmapsValid && !isEdit ? (
           <>
             <PlacesSearch onSelect={handlePlaceSelect} initialValue={name} />
-            {name && (
+            {placeSelected && (
               <div style={{ position: "relative" }}>
                 <input className="input" style={{ marginTop: ".5rem" }}
                   placeholder="Edit nama (opsional)" value={name} maxLength={50}
