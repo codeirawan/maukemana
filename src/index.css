@@ -82,7 +82,8 @@ body { margin: 0; }
 .page {
   position: relative; z-index: 1;
   max-width: 480px; margin: 0 auto;
-  padding: 0 16px 120px;
+  --page-px: 16px;
+  padding: 0 var(--page-px) 120px;
 }
 
 /* ── Card styles ── */
@@ -262,8 +263,8 @@ input[type="datetime-local"].input { color-scheme: light; }
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 2px;
-  width: calc(100% + 32px);
-  margin-left: -16px;
+  width: calc(100% + var(--page-px) * 2);
+  margin-left: calc(-1 * var(--page-px));
   overflow: hidden;
 }
 .archive-cell {
@@ -646,6 +647,6 @@ input[type="time"].input::-webkit-calendar-picker-indicator {
 
 /* ── Responsive ── */
 @media (max-width: 480px) {
-  .page { padding: 0 12px 120px; }
+  .page { --page-px: 12px; padding: 0 var(--page-px) 120px; }
   .app-header-title { font-size: 24px; }
 }
