@@ -263,9 +263,9 @@ input[type="datetime-local"].input { color-scheme: light; }
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 2px;
-  width: calc(100% + var(--page-px) * 2);
-  margin-left: calc(-1 * var(--page-px));
-  overflow: hidden;
+  width: 100vw;
+  max-width: 480px;
+  margin-left: calc(-50vw + 50%);
 }
 .archive-cell {
   aspect-ratio: 1;
