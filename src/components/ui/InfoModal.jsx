@@ -3,10 +3,10 @@ import CoffeeModal from "./CoffeeModal";
 import { useState } from "react";
 
 const FEATURES = [
-  { Icon: IconCompass, text: "Simpan tempat & resto yang ingin dikunjungi" },
+  { Icon: IconCompass, text: "Simpan tempat & resto yang ingin dikunjungi di Plans" },
   { Icon: IconMapPin,  text: "Atur kategori, prioritas, dan jadwal kunjungan" },
   { Icon: IconCamera,  text: "Foto & rating setelah berkunjung" },
-  { Icon: IconCheck,   text: "Arsip otomatis ke Sudah Dikunjungi" },
+  { Icon: IconCheck,   text: "Arsip otomatis ke Memories setelah dikunjungi" },
 ];
 
 export default function InfoModal({ onClose }) {
@@ -28,12 +28,12 @@ export default function InfoModal({ onClose }) {
               <IconMapPin size={26} />
             </div>
             <div className="sheet-title">Mau Ke Mana?</div>
-            <p className="sheet-subtitle">Wishlist tempat & resto favoritmu</p>
+            <p className="sheet-subtitle">Plans & Memories tempat favoritmu</p>
             <button className="sheet-close" onClick={onClose}><IconX size={16} /></button>
           </div>
 
           <p style={{ fontSize: ".85rem", color: "var(--muted)", lineHeight: 1.6, marginBottom: "1.25rem" }}>
-            Catat semua tempat yang pengin kamu datangi — dari resto hits, cafe estetik, sampai destinasi wisata. Tandai sudah dikunjungi, kasih rating, dan upload foto kenangannya.
+            Catat semua tempat yang pengin kamu datangi di Plans — dari resto hits, cafe estetik, sampai destinasi wisata. Tandai sudah dikunjungi, kasih rating, dan upload foto kenangannya di Memories.
           </p>
 
           <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: "1.5rem" }}>
