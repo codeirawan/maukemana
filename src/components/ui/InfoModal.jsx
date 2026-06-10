@@ -58,7 +58,7 @@ export default function InfoModal({ onClose }) {
               style={{ fontSize: ".75rem", color: "var(--dim)", background: "none", border: "none", cursor: "pointer", padding: 0, fontFamily: "inherit", flexShrink: 0 }}>
               v1.0 · dibuat dengan ☕
             </button>
-            <button className="btn btn-primary btn-sm" style={{ flexShrink: 0 }} onClick={onClose}>Oke, siap!</button>
+            <button className="btn btn-primary btn-sm" style={{ width: "auto" }} onClick={onClose}>Oke, siap!</button>
           </div>
 
         </div>
