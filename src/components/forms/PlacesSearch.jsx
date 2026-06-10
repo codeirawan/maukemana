@@ -65,7 +65,7 @@ export default function PlacesSearch({ onSelect, initialValue = "" }) {
               {s.secondaryText && <span className="places-sub">{s.secondaryText}</span>}
             </button>
           ))}
-          <div className="places-powered">Powered by Google</div>
+          <div className="places-powered">© OpenStreetMap contributors</div>
         </div>
       )}
     </div>

@@ -1,64 +1,56 @@
-const KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-export const gmapsValid = !!KEY;
+// Photon by Komoot — OpenStreetMap geocoding, no API key required
+// https://photon.komoot.io
+
+const _cache = new Map();
+
+export const gmapsValid = true; // always available
 
 export async function searchPlaces(input) {
-  if (!KEY || !input) return [];
+  if (!input || input.length < 2) return [];
   try {
-    const res = await fetch("https://places.googleapis.com/v1/places:autocomplete", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "X-Goog-Api-Key": KEY },
-      body: JSON.stringify({ input, languageCode: "id" }),
-    });
+    const res = await fetch(
+      `https://photon.komoot.io/api/?q=${encodeURIComponent(input)}&limit=6&lang=id`,
+      { headers: { "User-Agent": "maukemana-app/1.0" } }
+    );
+    if (!res.ok) return [];
     const data = await res.json();
-    return (data.suggestions || []).flatMap((s) => {
-      const p = s.placePrediction;
-      if (!p?.structuredFormat?.mainText?.text) return [];
-      return [{
-        placeId: p.placeId,
-        mainText: p.structuredFormat.mainText.text,
-        secondaryText: p.structuredFormat.secondaryText?.text || "",
-      }];
+
+    return (data.features || []).flatMap((f, i) => {
+      const props = f.properties;
+      const mainText = props.name || props.street;
+      if (!mainText) return [];
+
+      const id = `${props.osm_type || "X"}${props.osm_id ?? i}`;
+      _cache.set(id, f);
+
+      const cityPart = props.city || props.town || props.village || props.county || "";
+      const secondaryText = [cityPart, props.country].filter(Boolean).join(", ");
+
+      return [{ placeId: id, mainText, secondaryText }];
     });
   } catch { return []; }
 }
 
 export async function getPlaceDetails(placeId) {
-  if (!KEY) return null;
-  try {
-    const fields = "displayName,formattedAddress,location,googleMapsUri,addressComponents";
-    const res = await fetch(
-      `https://places.googleapis.com/v1/places/${placeId}?fields=${fields}&languageCode=id`,
-      { headers: { "X-Goog-Api-Key": KEY } }
-    );
-    const data = await res.json();
+  const f = _cache.get(placeId);
+  if (!f) return null;
 
-    // Extract city: prefer locality → administrative_area_level_2 → administrative_area_level_1
-    let city = "";
-    const priority = ["locality", "administrative_area_level_2", "administrative_area_level_1"];
-    for (const type of priority) {
-      const comp = (data.addressComponents || []).find((c) => c.types.includes(type));
-      if (comp) { city = comp.longText; break; }
-    }
+  const props = f.properties;
+  const [lng, lat] = f.geometry.coordinates;
 
-    return {
-      name: data.displayName?.text || "",
-      address: data.formattedAddress || "",
-      city,
-      lat: data.location?.latitude ?? null,
-      lng: data.location?.longitude ?? null,
-      placeId,
-      mapsUrl: data.googleMapsUri || "",
-    };
-  } catch { return null; }
+  const streetPart = [props.street, props.housenumber].filter(Boolean).join(" ");
+  const city = props.city || props.town || props.village || props.county || props.state || "";
+  const address = [streetPart, city, props.state, props.country].filter(Boolean).join(", ");
+
+  return {
+    name: props.name || props.street || "",
+    address,
+    city,
+    lat,
+    lng,
+    placeId,
+    mapsUrl: `https://www.google.com/maps?q=${lat},${lng}`,
+  };
 }
 
-export function staticMapUrl(lat, lng, zoom = 16) {
-  if (!KEY || lat == null || lng == null) return null;
-  const pin = encodeURIComponent(`color:0x0891B2|${lat},${lng}`);
-  const style = [
-    "feature:poi|visibility:off",
-    "feature:transit|visibility:off",
-    "feature:administrative|visibility:simplified",
-  ].map((s) => `&style=${encodeURIComponent(s)}`).join("");
-  return `https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lng}&zoom=${zoom}&size=600x450&scale=2&markers=${pin}&key=${KEY}${style}`;
-}
+export function staticMapUrl() { return null; }
