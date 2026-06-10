@@ -89,13 +89,13 @@ function AppShell() {
         <button className="nav-item" onClick={() => setTab("wishlist")}
           style={{ color: tab === "wishlist" ? "#D97706" : "var(--dim)" }}>
           <span className="nav-item-icon"><RencanaIcon /></span>
-          <span>Rencana{wishlistCount > 0 ? ` (${wishlistCount})` : ""}</span>
+          <span>Rencana</span>
         </button>
         <button className="nav-fab" onClick={() => setShowForm(true)}>+</button>
         <button className="nav-item" onClick={() => setTab("archive")}
           style={{ color: tab === "archive" ? "#D97706" : "var(--dim)" }}>
           <span className="nav-item-icon"><SudahIcon /></span>
-          <span>Sudah{archiveCount > 0 ? ` (${archiveCount})` : ""}</span>
+          <span>Sudah</span>
         </button>
       </nav>
 
