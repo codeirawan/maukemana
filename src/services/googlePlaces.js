@@ -1,6 +1,8 @@
-// Photon by Komoot — OpenStreetMap geocoding, no API key required
-// https://photon.komoot.io
+// Nominatim — OpenStreetMap official geocoder, no API key required
+// Policy: max 1 req/s, identify via Referer (auto-set by browser)
+// https://nominatim.org/release-docs/latest/api/Search/
 
+const BASE = "https://nominatim.openstreetmap.org";
 const _cache = new Map();
 
 export const gmapsValid = true; // always available
@@ -8,25 +10,21 @@ export const gmapsValid = true; // always available
 export async function searchPlaces(input) {
   if (!input || input.length < 2) return [];
   try {
-    const res = await fetch(
-      `https://photon.komoot.io/api/?q=${encodeURIComponent(input)}&limit=6&lang=id`,
-      { headers: { "User-Agent": "maukemana-app/1.0" } }
-    );
+    const url = `${BASE}/search?q=${encodeURIComponent(input)}&format=jsonv2&limit=6&addressdetails=1`;
+    const res = await fetch(url);
     if (!res.ok) return [];
     const data = await res.json();
 
-    return (data.features || []).flatMap((f, i) => {
-      const props = f.properties;
-      const mainText = props.name || props.street;
-      if (!mainText) return [];
+    return (data || []).flatMap((f) => {
+      if (!f.name) return [];
+      const key = String(f.place_id);
+      _cache.set(key, f);
 
-      const id = `${props.osm_type || "X"}${props.osm_id ?? i}`;
-      _cache.set(id, f);
+      const addr = f.address || {};
+      const city = addr.city || addr.town || addr.village || addr.county || "";
+      const secondaryText = [city, addr.country].filter(Boolean).join(", ");
 
-      const cityPart = props.city || props.town || props.village || props.county || "";
-      const secondaryText = [cityPart, props.country].filter(Boolean).join(", ");
-
-      return [{ placeId: id, mainText, secondaryText }];
+      return [{ placeId: key, mainText: f.name, secondaryText }];
     });
   } catch { return []; }
 }
@@ -35,21 +33,17 @@ export async function getPlaceDetails(placeId) {
   const f = _cache.get(placeId);
   if (!f) return null;
 
-  const props = f.properties;
-  const [lng, lat] = f.geometry.coordinates;
-
-  const streetPart = [props.street, props.housenumber].filter(Boolean).join(" ");
-  const city = props.city || props.town || props.village || props.county || props.state || "";
-  const address = [streetPart, city, props.state, props.country].filter(Boolean).join(", ");
+  const addr = f.address || {};
+  const city = addr.city || addr.town || addr.village || addr.county || addr.state || "";
 
   return {
-    name: props.name || props.street || "",
-    address,
+    name: f.name,
+    address: f.display_name || "",
     city,
-    lat,
-    lng,
+    lat: parseFloat(f.lat),
+    lng: parseFloat(f.lon),
     placeId,
-    mapsUrl: `https://www.google.com/maps?q=${lat},${lng}`,
+    mapsUrl: `https://www.google.com/maps?q=${f.lat},${f.lon}`,
   };
 }
 

@@ -29,7 +29,7 @@ export default function PlacesSearch({ onSelect, initialValue = "" }) {
       setSuggestions(results);
       setOpen(results.length > 0);
       setLoading(false);
-    }, 380);
+    }, 500);
   }
 
   async function handleSelect(s) {
