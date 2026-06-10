@@ -1,9 +1,15 @@
 import { useState } from "react";
 import StarPicker from "../forms/StarPicker";
+import { IconUtensils, IconCoffee, IconMapPin, IconBuilding, IconMap, IconCheck, IconRotateCCW, IconEdit, IconTrash, IconX } from "./Icons";
 
-const CAT_EMOJI = { resto: "🍽️", cafe: "☕", tempat: "📍", hotel: "🏨" };
-const CAT_COLOR = { resto: "#C84B31", cafe: "#8B5E3C", tempat: "#2D6A4F", hotel: "#1A5276" };
-const PRIO_LBL  = { high: "Tinggi", med: "Sedang", low: "Rendah" };
+const CAT = {
+  resto:  { Icon: IconUtensils, color: "#C84B31", label: "Resto" },
+  cafe:   { Icon: IconCoffee,   color: "#8B5E3C", label: "Cafe" },
+  tempat: { Icon: IconMapPin,   color: "#2D6A4F", label: "Tempat" },
+  hotel:  { Icon: IconBuilding, color: "#1A5276", label: "Hotel" },
+};
+const DEFAULT_CAT = { Icon: IconMapPin, color: "#6B7280", label: "Lainnya" };
+const PRIO_LBL    = { high: "Tinggi", med: "Sedang", low: "Rendah" };
 
 function fmtScheduled(val) {
   if (!val) return null;
@@ -17,6 +23,8 @@ function fmtScheduled(val) {
 
 export default function DetailModal({ item, mode, onClose, onVisit, onRestore, onDelete, onEdit }) {
   const [confirming, setConfirming] = useState(false);
+  const cat = CAT[item.category] || DEFAULT_CAT;
+  const { Icon } = cat;
 
   function handleOverlay(e) {
     if (e.target === e.currentTarget) onClose();
@@ -25,11 +33,15 @@ export default function DetailModal({ item, mode, onClose, onVisit, onRestore, o
   return (
     <div className="detail-overlay" onClick={handleOverlay}>
       <div className="detail-sheet">
-        <div className="detail-strip" style={{ background: CAT_COLOR[item.category] ?? "#64748B" }} />
+        <div className="detail-strip" style={{ background: cat.color }} />
 
         <div className="detail-head">
-          <button className="detail-close" onClick={onClose}>✕</button>
-          <span className="detail-icon">{CAT_EMOJI[item.category] ?? "📌"}</span>
+          <button className="detail-close" onClick={onClose}>
+            <IconX size={16} />
+          </button>
+          <div className="detail-icon" style={{ color: cat.color, background: `${cat.color}22`, border: `1.5px solid ${cat.color}44` }}>
+            <Icon size={28} />
+          </div>
           <div className="detail-name">{item.name}</div>
         </div>
 
@@ -39,7 +51,7 @@ export default function DetailModal({ item, mode, onClose, onVisit, onRestore, o
           <div className="detail-meta">
             <div className="detail-row">
               <span className="detail-key">Kategori</span>
-              <span className="detail-val">{item.category}</span>
+              <span className="detail-val">{cat.label}</span>
             </div>
             {item.scheduledAt && (
               <div className="detail-row">
@@ -95,26 +107,28 @@ export default function DetailModal({ item, mode, onClose, onVisit, onRestore, o
           <div className="detail-actions">
             {item.mapsUrl && (
               <a className="maps-link-btn" href={item.mapsUrl} target="_blank" rel="noreferrer">
-                🗺️ Lihat Peta
+                <IconMap size={13} /> Lihat Peta
               </a>
             )}
             {mode === "wishlist" && (
               <button className="btn btn-action btn-sm" onClick={() => { onClose(); onVisit(item); }}>
-                ✅ Sudah Dikunjungi!
+                <IconCheck size={13} /> Sudah Dikunjungi!
               </button>
             )}
             {mode === "archive" && (
               <button className="btn btn-ghost btn-sm" onClick={() => { onRestore(item.id); onClose(); }}>
-                ↩ Kembalikan
+                <IconRotateCCW size={13} /> Kembalikan
               </button>
             )}
             {onEdit && (
               <button className="btn btn-ghost btn-sm" onClick={() => { onClose(); onEdit(item); }}>
-                ✏️ Edit
+                <IconEdit size={13} /> Edit
               </button>
             )}
             {!confirming ? (
-              <button className="btn btn-ghost btn-sm" onClick={() => setConfirming(true)}>🗑 Hapus</button>
+              <button className="btn btn-ghost btn-sm" onClick={() => setConfirming(true)}>
+                <IconTrash size={13} /> Hapus
+              </button>
             ) : (
               <div className="detail-confirm">
                 <span>Hapus permanen?</span>

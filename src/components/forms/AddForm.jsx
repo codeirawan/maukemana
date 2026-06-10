@@ -5,17 +5,18 @@ import { validateItem } from "../../utils/validate";
 import { gmapsValid } from "../../services/googlePlaces";
 import PlacesSearch from "./PlacesSearch";
 import StarPicker from "./StarPicker";
+import { IconUtensils, IconCoffee, IconMapPin, IconBuilding, IconCamera, IconLock, IconMap, IconMessage } from "../ui/Icons";
 
 const CATEGORIES = [
-  { value: "resto",  label: "🍽️ Resto" },
-  { value: "cafe",   label: "☕ Cafe" },
-  { value: "tempat", label: "📍 Tempat" },
-  { value: "hotel",  label: "🏨 Hotel" },
+  { value: "resto",  label: "Resto",  Icon: IconUtensils },
+  { value: "cafe",   label: "Cafe",   Icon: IconCoffee },
+  { value: "tempat", label: "Tempat", Icon: IconMapPin },
+  { value: "hotel",  label: "Hotel",  Icon: IconBuilding },
 ];
 const PRIORITIES = [
-  { value: "high", label: "🔴 Tinggi" },
-  { value: "med",  label: "🟡 Sedang" },
-  { value: "low",  label: "🟢 Rendah" },
+  { value: "high", label: "Tinggi", dot: "#F87171" },
+  { value: "med",  label: "Sedang", dot: "#D97706" },
+  { value: "low",  label: "Rendah", dot: "#86EFAC" },
 ];
 
 function defaultScheduledAt() {
@@ -141,8 +142,9 @@ export default function AddForm({ items, onAdd, editItem, onUpdate, onClose, sho
           {CATEGORIES.map((c) => (
             <button key={c.value} type="button"
               className={`chip${category === c.value ? " active" : ""}`}
-              onClick={() => setCategory(c.value)}>
-              {c.label}
+              onClick={() => setCategory(c.value)}
+              style={{ display: "flex", alignItems: "center", gap: 5 }}>
+              <c.Icon size={12} />{c.label}
             </button>
           ))}
         </div>
@@ -155,7 +157,9 @@ export default function AddForm({ items, onAdd, editItem, onUpdate, onClose, sho
           {PRIORITIES.map((p) => (
             <button key={p.value} type="button"
               className={`chip${priority === p.value ? " active" : ""}`}
-              onClick={() => setPriority(priority === p.value ? null : p.value)}>
+              onClick={() => setPriority(priority === p.value ? null : p.value)}
+              style={{ display: "flex", alignItems: "center", gap: 5 }}>
+              <span style={{ width: 8, height: 8, borderRadius: "50%", background: p.dot, flexShrink: 0 }} />
               {p.label}
             </button>
           ))}
@@ -183,15 +187,21 @@ export default function AddForm({ items, onAdd, editItem, onUpdate, onClose, sho
 
       {/* Catatan */}
       <div className="field">
-        <input className="input" placeholder="💬 Catatan (opsional)"
-          value={notes} onChange={(e) => setNotes(e.target.value)} />
+        <div className="input-icon-wrap">
+          <IconMessage size={14} />
+          <input className="input input-with-icon" placeholder="Catatan (opsional)"
+            value={notes} onChange={(e) => setNotes(e.target.value)} />
+        </div>
       </div>
 
       {/* Maps URL */}
       <div className="field">
-        <input className="input"
-          placeholder="🗺️ Link Google Maps (opsional)"
-          value={mapsUrl} onChange={(e) => setMapsUrl(e.target.value)} />
+        <div className="input-icon-wrap">
+          <IconMap size={14} />
+          <input className="input input-with-icon"
+            placeholder="Link Google Maps (opsional)"
+            value={mapsUrl} onChange={(e) => setMapsUrl(e.target.value)} />
+        </div>
       </div>
 
       {/* Rating + Foto — edit only */}
@@ -207,7 +217,9 @@ export default function AddForm({ items, onAdd, editItem, onUpdate, onClose, sho
               onChange={handlePhoto} disabled={!user} />
             {photoPreview
               ? <><img src={photoPreview} alt="" style={{ width: 24, height: 24, borderRadius: 4, objectFit: "cover" }} /> Foto dipilih</>
-              : !user ? "🔒 Login untuk foto" : "📷 Foto"}
+              : !user
+                ? <><IconLock size={13} /> Login untuk foto</>
+                : <><IconCamera size={13} /> Foto</>}
           </label>
         </div>
       )}

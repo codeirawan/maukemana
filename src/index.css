@@ -150,6 +150,15 @@ select.input { cursor: pointer; }
 input[type="datetime-local"].input { color-scheme: light; }
 .dark input[type="datetime-local"].input { color-scheme: dark; }
 
+/* ── Input with leading icon ── */
+.input-icon-wrap {
+  position: relative; display: flex; align-items: center;
+}
+.input-icon-wrap > svg {
+  position: absolute; left: 11px; color: var(--dim); pointer-events: none; flex-shrink: 0;
+}
+.input-with-icon { padding-left: 32px; }
+
 /* ── Filter bar ── */
 .filter-bar { margin-bottom: 6px; }
 

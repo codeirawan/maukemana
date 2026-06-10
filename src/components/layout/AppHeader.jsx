@@ -3,6 +3,7 @@ import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
 import { auth, configValid } from "../../firebase";
 import { useAuth } from "../../context/AuthContext";
 import CoffeeModal from "../ui/CoffeeModal";
+import { IconCoffee, IconSun, IconMoon, IconUser } from "../ui/Icons";
 
 const GoogleIcon = () => (
   <svg width="13" height="13" viewBox="0 0 18 18">
@@ -19,11 +20,9 @@ export default function AppHeader({ dark, onToggle }) {
 
   const btnStyle = {
     background: dark ? "rgba(255,255,255,.08)" : "rgba(0,0,0,.06)",
-    border: "1px solid var(--border)",
-    borderRadius: 50, padding: "6px 12px",
-    display: "flex", alignItems: "center",
-    color: "var(--muted)", fontSize: 16, cursor: "pointer",
-    transition: "opacity .15s",
+    border: "1px solid var(--border)", borderRadius: 50,
+    padding: "7px 10px", display: "flex", alignItems: "center",
+    color: "var(--muted)", cursor: "pointer", transition: "opacity .15s",
     fontFamily: "inherit",
   };
 
@@ -39,20 +38,28 @@ export default function AppHeader({ dark, onToggle }) {
           <div className="app-header-title">Mau Ke Mana</div>
         </div>
         <div className="app-header-actions">
-          <button onClick={() => setCoffeeOpen(true)} title="Support Developer" style={btnStyle}>☕</button>
+          <button onClick={() => setCoffeeOpen(true)} title="Support Developer" style={btnStyle}>
+            <IconCoffee size={15} />
+          </button>
           <button onClick={onToggle} title={dark ? "Mode Terang" : "Mode Gelap"} style={btnStyle}>
-            {dark ? "☀️" : "🌙"}
+            {dark ? <IconSun size={15} /> : <IconMoon size={15} />}
           </button>
           {configValid && !authLoading && (
             user
-              ? <button onClick={() => signOut(auth)} title="Logout" style={{ width: 36, height: 36, borderRadius: "50%", border: "2px solid var(--border)", overflow: "hidden", padding: 0, cursor: "pointer", background: "var(--surface)", flexShrink: 0 }}>
+              ? (
+                <button onClick={() => signOut(auth)} title="Logout"
+                  style={{ width: 36, height: 36, borderRadius: "50%", border: "2px solid var(--border)", overflow: "hidden", padding: 0, cursor: "pointer", background: "var(--surface)", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
                   {user.photoURL
                     ? <img src={user.photoURL} alt="" referrerPolicy="no-referrer" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                    : <span style={{ fontSize: 16 }}>👤</span>}
+                    : <IconUser size={16} />}
                 </button>
-              : <button onClick={handleLogin} disabled={authLoading} style={{ ...btnStyle, fontSize: 12, fontWeight: 600, gap: 6 }}>
+              )
+              : (
+                <button onClick={handleLogin} disabled={authLoading}
+                  style={{ ...btnStyle, fontSize: 12, fontWeight: 600, gap: 6 }}>
                   <GoogleIcon /> Sync
                 </button>
+              )
           )}
         </div>
       </div>

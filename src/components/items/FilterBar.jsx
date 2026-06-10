@@ -1,9 +1,11 @@
+import { IconUtensils, IconCoffee, IconMapPin, IconBuilding } from "../ui/Icons";
+
 const TYPE_PILLS = [
-  { value: "semua",  label: "Semua",    cls: "t-semua" },
-  { value: "resto",  label: "🍽 Resto",  cls: "t-resto" },
-  { value: "cafe",   label: "☕ Cafe",   cls: "t-cafe" },
-  { value: "tempat", label: "📍 Tempat", cls: "t-tempat" },
-  { value: "hotel",  label: "🏨 Hotel",  cls: "t-hotel" },
+  { value: "semua",  label: "Semua",   icon: null,                cls: "t-semua" },
+  { value: "resto",  label: "Resto",   icon: <IconUtensils size={12} />, cls: "t-resto" },
+  { value: "cafe",   label: "Cafe",    icon: <IconCoffee size={12} />,   cls: "t-cafe" },
+  { value: "tempat", label: "Tempat",  icon: <IconMapPin size={12} />,   cls: "t-tempat" },
+  { value: "hotel",  label: "Hotel",   icon: <IconBuilding size={12} />, cls: "t-hotel" },
 ];
 
 const SORT_OPTIONS = [
@@ -25,7 +27,6 @@ export default function FilterBar({
 
   return (
     <div className="filter-bar">
-      {/* Type pills */}
       <div className="type-pills-wrap">
         <div className="type-pills">
           {TYPE_PILLS.map((p) => (
@@ -34,28 +35,21 @@ export default function FilterBar({
               className={`type-pill ${p.cls}${catFilter === p.value ? " active" : ""}`}
               onClick={() => setCatFilter(p.value)}
             >
+              {p.icon && <span style={{ display: "flex", alignItems: "center" }}>{p.icon}</span>}
               {p.label}
             </button>
           ))}
         </div>
       </div>
 
-      {/* City chips — only if more than 1 city */}
       {cities.length > 1 && (
         <div className="city-chips-wrap">
           <div className="city-chips">
-            <button
-              className={`city-chip${cityFilter === "semua" ? " active" : ""}`}
-              onClick={() => setCityFilter("semua")}
-            >
+            <button className={`city-chip${cityFilter === "semua" ? " active" : ""}`} onClick={() => setCityFilter("semua")}>
               Semua
             </button>
             {cities.map((c) => (
-              <button
-                key={c}
-                className={`city-chip${cityFilter === c ? " active" : ""}`}
-                onClick={() => setCityFilter(c)}
-              >
+              <button key={c} className={`city-chip${cityFilter === c ? " active" : ""}`} onClick={() => setCityFilter(c)}>
                 {c}
               </button>
             ))}
@@ -63,7 +57,6 @@ export default function FilterBar({
         </div>
       )}
 
-      {/* Count + sort */}
       <div className="filter-bottom-row">
         <span className="filter-count">{totalFiltered} tempat</span>
         <div className="sort-wrap">

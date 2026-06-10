@@ -1,27 +1,28 @@
 import { useState } from "react";
 import StarPicker from "../forms/StarPicker";
+import { IconUtensils, IconCoffee, IconMapPin, IconBuilding } from "../ui/Icons";
 
 const CAT = {
-  resto:  { emoji: "🍽️", color: "#C84B31", label: "Resto" },
-  cafe:   { emoji: "☕",  color: "#8B5E3C", label: "Cafe" },
-  tempat: { emoji: "📍", color: "#2D6A4F", label: "Tempat" },
-  hotel:  { emoji: "🏨", color: "#1A5276", label: "Hotel" },
+  resto:  { Icon: IconUtensils, color: "#C84B31", label: "Resto" },
+  cafe:   { Icon: IconCoffee,   color: "#8B5E3C", label: "Cafe" },
+  tempat: { Icon: IconMapPin,   color: "#2D6A4F", label: "Tempat" },
+  hotel:  { Icon: IconBuilding, color: "#1A5276", label: "Hotel" },
 };
-const DEFAULT_CAT = { emoji: "📌", color: "#6B7280", label: "Lainnya" };
+const DEFAULT_CAT = { Icon: IconMapPin, color: "#6B7280", label: "Lainnya" };
 
 const PRIO_LBL   = { high: "Tinggi", med: "Sedang", low: "Rendah" };
 const PRIO_COLOR = { high: "#F87171", med: "#D97706", low: "#94A3B8" };
 
 function fmtDate(val) {
   if (!val) return null;
-  try {
-    return new Date(val).toLocaleDateString("id-ID", { day: "numeric", month: "short" });
-  } catch { return null; }
+  try { return new Date(val).toLocaleDateString("id-ID", { day: "numeric", month: "short" }); }
+  catch { return null; }
 }
 
 export default function ItemRow({ item, mode, onVisit, onRestore, onDelete, onCardClick }) {
   const [confirming, setConfirming] = useState(false);
   const cat = CAT[item.category] || DEFAULT_CAT;
+  const { Icon } = cat;
 
   const badgeBg  = `${cat.color}22`;
   const badgeBdr = `1.5px solid ${cat.color}44`;
@@ -34,8 +35,13 @@ export default function ItemRow({ item, mode, onVisit, onRestore, onDelete, onCa
   return (
     <div className="item-card" onClick={handleClick}>
       {/* Icon badge */}
-      <div style={{ width: 42, height: 42, borderRadius: 13, flexShrink: 0, background: badgeBg, border: badgeBdr, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>
-        {cat.emoji}
+      <div style={{
+        width: 42, height: 42, borderRadius: 13, flexShrink: 0,
+        background: badgeBg, border: badgeBdr,
+        display: "flex", alignItems: "center", justifyContent: "center",
+        color: cat.color,
+      }}>
+        <Icon size={20} />
       </div>
 
       {/* Body */}
@@ -67,19 +73,13 @@ export default function ItemRow({ item, mode, onVisit, onRestore, onDelete, onCa
       {/* Right actions */}
       <div className="item-card-right" onClick={e => e.stopPropagation()}>
         {mode === "wishlist" && !confirming && (
-          <button className="item-sudah-btn" onClick={() => onVisit(item)}>
-            Sudah!
-          </button>
+          <button className="item-sudah-btn" onClick={() => onVisit(item)}>Sudah!</button>
         )}
 
         {mode === "archive" && !confirming && (
           <>
-            <button className="item-action-btn del-btn" title="Kembalikan ke wishlist" onClick={() => onRestore(item.id)}>
-              ↩
-            </button>
-            <button className="item-action-btn item-action-btn-del del-btn" title="Hapus" onClick={() => setConfirming(true)}>
-              ×
-            </button>
+            <button className="item-action-btn" title="Kembalikan ke rencana" onClick={() => onRestore(item.id)}>↩</button>
+            <button className="item-action-btn item-action-btn-del" title="Hapus" onClick={() => setConfirming(true)}>×</button>
           </>
         )}
 
