@@ -3,8 +3,7 @@ import { IconX } from "./Icons";
 export default function CoffeeModal({ onClose }) {
   return (
     <div className="sheet-overlay" onClick={onClose}>
-      <div className="bottom-sheet"
-        style={{ textAlign: "center", width: "calc(100% - 48px)", maxWidth: 420, borderRadius: 20, marginBottom: "max(16px, env(safe-area-inset-bottom))", paddingBottom: "1.5rem" }}
+      <div className="bottom-sheet" style={{ textAlign: "center" }}
         onClick={e => e.stopPropagation()}>
 
         <div className="sheet-head">
