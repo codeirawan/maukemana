@@ -26,118 +26,116 @@ export default function DetailModal({ item, mode, onClose, onVisit, onRestore, o
   const cat = CAT[item.category] || DEFAULT_CAT;
   const { Icon } = cat;
 
-  function handleOverlay(e) {
-    if (e.target === e.currentTarget) onClose();
-  }
-
   return (
-    <div className="detail-overlay" onClick={handleOverlay}>
-      <div className="detail-sheet">
-        <div className="detail-strip" style={{ background: cat.color }} />
+    <div className="sheet-overlay" onClick={onClose}>
+      <div className="bottom-sheet" onClick={e => e.stopPropagation()}>
 
-        <div className="detail-head">
-          <button className="detail-close" onClick={onClose}>
-            <IconX size={16} />
-          </button>
-          <div className="detail-icon" style={{ color: cat.color, background: `${cat.color}22`, border: `1.5px solid ${cat.color}44` }}>
-            <Icon size={28} />
+        {/* Header */}
+        <div className="sheet-head">
+          <div className="sheet-handle" />
+          <div style={{
+            width: 52, height: 52, borderRadius: "50%",
+            background: `${cat.color}22`, border: `1.5px solid ${cat.color}55`,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            color: cat.color, marginBottom: ".5rem",
+          }}>
+            <Icon size={26} />
           </div>
-          <div className="detail-name">{item.name}</div>
+          <div className="sheet-title" style={{ marginBottom: ".15rem" }}>{item.name}</div>
+          <p className="sheet-subtitle">
+            {cat.label}{item.city ? ` · ${item.city}` : ""}
+          </p>
+          <button className="sheet-close" onClick={onClose}><IconX size={16} /></button>
         </div>
 
-        <div className="detail-body">
-          {item.notes && <div className="detail-note">"{item.notes}"</div>}
+        {/* Catatan */}
+        {item.notes && (
+          <div className="detail-note">"{item.notes}"</div>
+        )}
 
-          <div className="detail-meta">
+        {/* Foto */}
+        {item.photoUrl && (
+          <img src={item.photoUrl} alt={item.name}
+            style={{ width: "100%", borderRadius: 12, marginBottom: 16, objectFit: "cover", maxHeight: 200 }} />
+        )}
+
+        {/* Meta rows */}
+        <div className="detail-meta">
+          {item.scheduledAt && (
             <div className="detail-row">
-              <span className="detail-key">Kategori</span>
-              <span className="detail-val">{cat.label}</span>
+              <span className="detail-key">Jadwal</span>
+              <span className="detail-val">{fmtScheduled(item.scheduledAt)}</span>
             </div>
-            {item.scheduledAt && (
-              <div className="detail-row">
-                <span className="detail-key">Jadwal</span>
-                <span className="detail-val">{fmtScheduled(item.scheduledAt)}</span>
-              </div>
-            )}
-            {item.city && (
-              <div className="detail-row">
-                <span className="detail-key">Kota</span>
-                <span className="detail-val">{item.city}</span>
-              </div>
-            )}
-            {item.priority && (
-              <div className="detail-row">
-                <span className="detail-key">Prioritas</span>
-                <span className="detail-val">{PRIO_LBL[item.priority]}</span>
-              </div>
-            )}
-            {item.rating && (
-              <div className="detail-row">
-                <span className="detail-key">Rating</span>
-                <span className="detail-val"><StarPicker value={item.rating} onChange={() => {}} readonly /></span>
-              </div>
-            )}
-            {item.address && (
-              <div className="detail-row">
-                <span className="detail-key">Alamat</span>
-                <span className="detail-val" style={{ fontSize: ".8rem" }}>{item.address}</span>
-              </div>
-            )}
-            {mode === "archive" && item.visitedAt && (
-              <div className="detail-row">
-                <span className="detail-key">Dikunjungi</span>
-                <span className="detail-val">
-                  {new Date(item.visitedAt).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
-                </span>
-              </div>
-            )}
+          )}
+          {item.priority && (
             <div className="detail-row">
-              <span className="detail-key">Ditambah</span>
+              <span className="detail-key">Prioritas</span>
+              <span className="detail-val">{PRIO_LBL[item.priority]}</span>
+            </div>
+          )}
+          {item.rating && (
+            <div className="detail-row">
+              <span className="detail-key">Rating</span>
+              <span className="detail-val"><StarPicker value={item.rating} onChange={() => {}} readonly /></span>
+            </div>
+          )}
+          {item.address && (
+            <div className="detail-row">
+              <span className="detail-key">Alamat</span>
+              <span className="detail-val" style={{ fontSize: ".8rem" }}>{item.address}</span>
+            </div>
+          )}
+          {mode === "archive" && item.visitedAt && (
+            <div className="detail-row">
+              <span className="detail-key">Dikunjungi</span>
               <span className="detail-val">
-                {new Date(item.addedAt).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
+                {new Date(item.visitedAt).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
               </span>
             </div>
-          </div>
-
-          {item.photoUrl && (
-            <img src={item.photoUrl} alt={item.name}
-              style={{ width: "100%", borderRadius: 12, marginBottom: 16, objectFit: "cover", maxHeight: 200 }} />
           )}
-
-          <div className="detail-actions">
-            {item.mapsUrl && (
-              <a className="maps-link-btn" href={item.mapsUrl} target="_blank" rel="noreferrer">
-                <IconMap size={13} /> Lihat Peta
-              </a>
-            )}
-            {mode === "wishlist" && (
-              <button className="btn btn-action btn-sm" onClick={() => { onClose(); onVisit(item); }}>
-                <IconCheck size={13} /> Sudah Dikunjungi!
-              </button>
-            )}
-            {mode === "archive" && (
-              <button className="btn btn-ghost btn-sm" onClick={() => { onRestore(item.id); onClose(); }}>
-                <IconRotateCCW size={13} /> Kembalikan
-              </button>
-            )}
-            {onEdit && (
-              <button className="btn btn-ghost btn-sm" onClick={() => { onClose(); onEdit(item); }}>
-                <IconEdit size={13} /> Edit
-              </button>
-            )}
-            {!confirming ? (
-              <button className="btn btn-ghost btn-sm" onClick={() => setConfirming(true)}>
-                <IconTrash size={13} /> Hapus
-              </button>
-            ) : (
-              <div className="detail-confirm">
-                <span>Hapus permanen?</span>
-                <button className="btn btn-danger btn-sm" onClick={() => { onDelete(item.id, item.photoPath); onClose(); }}>Ya</button>
-                <button className="btn btn-ghost btn-sm" onClick={() => setConfirming(false)}>Tidak</button>
-              </div>
-            )}
+          <div className="detail-row">
+            <span className="detail-key">Ditambah</span>
+            <span className="detail-val">
+              {new Date(item.addedAt).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
+            </span>
           </div>
         </div>
+
+        {/* Actions */}
+        <div className="detail-actions">
+          {item.mapsUrl && (
+            <a className="maps-link-btn" href={item.mapsUrl} target="_blank" rel="noreferrer">
+              <IconMap size={13} /> Lihat Peta
+            </a>
+          )}
+          {mode === "wishlist" && (
+            <button className="btn btn-action btn-sm" onClick={() => { onClose(); onVisit(item); }}>
+              <IconCheck size={13} /> Sudah Dikunjungi!
+            </button>
+          )}
+          {mode === "archive" && (
+            <button className="btn btn-ghost btn-sm" onClick={() => { onRestore(item.id); onClose(); }}>
+              <IconRotateCCW size={13} /> Kembalikan
+            </button>
+          )}
+          {onEdit && (
+            <button className="btn btn-ghost btn-sm" onClick={() => { onClose(); onEdit(item); }}>
+              <IconEdit size={13} /> Edit
+            </button>
+          )}
+          {!confirming ? (
+            <button className="btn btn-ghost btn-sm" onClick={() => setConfirming(true)}>
+              <IconTrash size={13} /> Hapus
+            </button>
+          ) : (
+            <div className="detail-confirm">
+              <span>Hapus permanen?</span>
+              <button className="btn btn-danger btn-sm" onClick={() => { onDelete(item.id, item.photoPath); onClose(); }}>Ya</button>
+              <button className="btn btn-ghost btn-sm" onClick={() => setConfirming(false)}>Tidak</button>
+            </div>
+          )}
+        </div>
+
       </div>
     </div>
   );

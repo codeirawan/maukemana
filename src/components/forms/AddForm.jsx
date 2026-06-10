@@ -45,7 +45,7 @@ export default function AddForm({ items, onAdd, editItem, onUpdate, onClose, sho
   const [notes, setNotes]           = useState(editItem?.notes || "");
   const [mapsUrl, setMapsUrl]       = useState(editItem?.mapsUrl || "");
   const [priority, setPriority]     = useState(editItem?.priority || null);
-  const [schedDate, setSchedDate]   = useState(initDT.date || defaultDate());
+  const [schedDate, setSchedDate]   = useState(initDT.date || "");
   const [schedTime, setSchedTime]   = useState(initDT.time || "12:00");
 
   const [rating, setRating]         = useState(editItem?.rating || null);

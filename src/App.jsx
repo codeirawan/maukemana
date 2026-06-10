@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { configValid } from "./firebase";
 import { AuthProvider, useAuth } from "./context/AuthContext";
-import { useItems } from "./hooks/useItems";
+import { ItemsProvider, useItems } from "./context/ItemsContext";
 import { useToast } from "./hooks/useToast";
 import AppHeader from "./components/layout/AppHeader";
 import WishlistPage from "./pages/WishlistPage";
@@ -53,9 +53,8 @@ function AppShell() {
     </div>
   );
 
-  const wishlistCount  = items.filter(i => !i.archived).length;
-  const archiveCount   = items.filter(i => i.archived).length;
-  const scheduledCount = items.filter(i => !i.archived && i.scheduledAt).length;
+  const wishlistCount = items.filter(i => !i.archived).length;
+  const archiveCount  = items.filter(i => i.archived).length;
 
   return (
     <div className="app-wrap">
@@ -64,7 +63,6 @@ function AppShell() {
       <div className="page">
         <AppHeader dark={dark} onToggle={() => setDark(d => !d)} />
 
-        {/* Stats strip */}
         <div className="stats-strip">
           <div className="stat-card" style={{ background: "linear-gradient(135deg, #D97706, #F97316)", boxShadow: "0 4px 16px rgba(217,119,6,.3)" }}>
             <div className="stat-card-label">Rencana</div>
@@ -74,10 +72,6 @@ function AppShell() {
             <div className="stat-card-label">Sudah Visit</div>
             <div className="stat-card-val">{archiveCount}</div>
           </div>
-          <div className="stat-card" style={{ background: "linear-gradient(135deg, #0891B2, #0E7490)", boxShadow: "0 4px 16px rgba(8,145,178,.25)" }}>
-            <div className="stat-card-label">Terjadwal</div>
-            <div className="stat-card-val">{scheduledCount}</div>
-          </div>
         </div>
 
         {tab === "wishlist"
@@ -86,16 +80,13 @@ function AppShell() {
         }
       </div>
 
-      {/* Bottom nav */}
       <nav className="nav">
         <button className="nav-item" onClick={() => setTab("wishlist")}
           style={{ color: tab === "wishlist" ? "#D97706" : "var(--dim)" }}>
           <span className="nav-item-icon"><RencanaIcon /></span>
           <span>Rencana{wishlistCount > 0 ? ` (${wishlistCount})` : ""}</span>
         </button>
-
         <button className="nav-fab" onClick={() => setShowForm(true)}>+</button>
-
         <button className="nav-item" onClick={() => setTab("archive")}
           style={{ color: tab === "archive" ? "#D97706" : "var(--dim)" }}>
           <span className="nav-item-icon"><SudahIcon /></span>
@@ -103,7 +94,6 @@ function AppShell() {
         </button>
       </nav>
 
-      {/* Add form sheet */}
       {showForm && (
         <div className="sheet-overlay" onClick={() => setShowForm(false)}>
           <div className="bottom-sheet" onClick={e => e.stopPropagation()}>
@@ -112,17 +102,10 @@ function AppShell() {
         </div>
       )}
 
-      {/* Edit form sheet */}
       {editItem && (
         <div className="sheet-overlay" onClick={() => setEditItem(null)}>
           <div className="bottom-sheet" onClick={e => e.stopPropagation()}>
-            <AddForm
-              items={items}
-              editItem={editItem}
-              onUpdate={updateItem}
-              onClose={() => setEditItem(null)}
-              showToast={showToast}
-            />
+            <AddForm items={items} editItem={editItem} onUpdate={updateItem} onClose={() => setEditItem(null)} showToast={showToast} />
           </div>
         </div>
       )}
@@ -135,7 +118,9 @@ function AppShell() {
 export default function App() {
   return (
     <AuthProvider>
-      <AppShell />
+      <ItemsProvider>
+        <AppShell />
+      </ItemsProvider>
     </AuthProvider>
   );
 }

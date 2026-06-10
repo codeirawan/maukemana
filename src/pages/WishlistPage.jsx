@@ -1,9 +1,10 @@
 import { useState, useMemo } from "react";
-import { useItems } from "../hooks/useItems";
+import { useItems } from "../context/ItemsContext";
 import VisitModal from "../components/forms/VisitModal";
 import FilterBar from "../components/items/FilterBar";
 import ItemList from "../components/items/ItemList";
 import DetailModal from "../components/ui/DetailModal";
+import { IconSearchX, IconCompass } from "../components/ui/Icons";
 
 function sortItems(arr, sort) {
   const copy = [...arr];
@@ -74,13 +75,17 @@ export default function WishlistPage({ showToast, onEditItem }) {
         onCardClick={setSelected}
         emptyState={
           search || catFilter !== "semua" || cityFilter !== "semua"
-            ? { icon: "📭", title: "Tidak ada hasil", desc: "Coba ubah filter atau kata kunci." }
-            : { icon: "📅", title: "Itinerary masih kosong", desc: "Tambah tempat yang ingin kamu kunjungi!" }
+            ? { icon: <IconSearchX size={48} />, title: "Tidak ada hasil", desc: "Coba ubah filter atau kata kunci." }
+            : { icon: <IconCompass size={48} />, title: "Itinerary masih kosong", desc: "Tambah tempat yang ingin kamu kunjungi!" }
         }
       />
 
       {visitingItem && (
-        <VisitModal item={visitingItem} onConfirm={handleVisitConfirm} onClose={() => setVisiting(null)} />
+        <div className="sheet-overlay" onClick={() => setVisiting(null)}>
+          <div className="bottom-sheet" onClick={e => e.stopPropagation()}>
+            <VisitModal item={visitingItem} onConfirm={handleVisitConfirm} onClose={() => setVisiting(null)} />
+          </div>
+        </div>
       )}
 
       {selectedItem && (

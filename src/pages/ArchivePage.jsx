@@ -1,8 +1,9 @@
 import { useState, useMemo } from "react";
-import { useItems } from "../hooks/useItems";
+import { useItems } from "../context/ItemsContext";
 import FilterBar from "../components/items/FilterBar";
 import ItemList from "../components/items/ItemList";
 import DetailModal from "../components/ui/DetailModal";
+import { IconSearchX, IconCheck } from "../components/ui/Icons";
 
 function sortItems(arr, sort) {
   const copy = [...arr];
@@ -78,8 +79,8 @@ export default function ArchivePage({ showToast, onEditItem }) {
         onCardClick={setSelected}
         emptyState={
           search || catFilter !== "semua" || cityFilter !== "semua"
-            ? { icon: "📭", title: "Tidak ada hasil", desc: "Coba ubah filter atau kata kunci." }
-            : { icon: "✅", title: "Belum ada yang dikunjungi", desc: "Klik 'Sudah!' setelah berkunjung ke suatu tempat." }
+            ? { icon: <IconSearchX size={48} />, title: "Tidak ada hasil", desc: "Coba ubah filter atau kata kunci." }
+            : { icon: <IconCheck size={48} />, title: "Belum ada yang dikunjungi", desc: "Klik 'Sudah!' setelah berkunjung ke suatu tempat." }
         }
       />
 

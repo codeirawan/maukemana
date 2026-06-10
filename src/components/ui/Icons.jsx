@@ -144,6 +144,22 @@ export const IconChevronDown = ({ size = 16 }) => (
   </svg>
 );
 
+export const IconSearchX = ({ size = 16 }) => (
+  <svg {...props(size)}>
+    <circle cx="11" cy="11" r="8"/>
+    <path d="m21 21-4.35-4.35"/>
+    <path d="m8 8 6 6"/>
+    <path d="m14 8-6 6"/>
+  </svg>
+);
+
+export const IconGoogle = ({ size = 16 }) => (
+  <svg {...props(size)}>
+    <path d="M17 10A5.4 5.4 0 1 0 17 14"/>
+    <polyline points="17 14 12 14 12 11 16 11"/>
+  </svg>
+);
+
 export const IconCompass = ({ size = 16 }) => (
   <svg {...props(size)}>
     <circle cx="12" cy="12" r="10"/>

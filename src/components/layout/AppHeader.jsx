@@ -3,7 +3,7 @@ import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
 import { auth, configValid } from "../../firebase";
 import { useAuth } from "../../context/AuthContext";
 import CoffeeModal from "../ui/CoffeeModal";
-import { IconCoffee, IconSun, IconMoon, IconUser } from "../ui/Icons";
+import { IconSun, IconMoon, IconUser } from "../ui/Icons";
 
 const GoogleIcon = () => (
   <svg width="13" height="13" viewBox="0 0 18 18">
@@ -38,8 +38,9 @@ export default function AppHeader({ dark, onToggle }) {
           <div className="app-header-title">Mau Ke Mana</div>
         </div>
         <div className="app-header-actions">
-          <button onClick={() => setCoffeeOpen(true)} title="Support Developer" style={btnStyle}>
-            <IconCoffee size={15} />
+          <button onClick={() => setCoffeeOpen(true)} title="Support Developer"
+            style={{ ...btnStyle, fontWeight: 800, fontSize: 15, letterSpacing: "-.5px", minWidth: 34 }}>
+            $
           </button>
           <button onClick={onToggle} title={dark ? "Mode Terang" : "Mode Gelap"} style={btnStyle}>
             {dark ? <IconSun size={15} /> : <IconMoon size={15} />}
