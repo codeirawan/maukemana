@@ -15,7 +15,7 @@ export default function CoffeeModal({ onClose }) {
         </div>
 
         <img
-          src="/qris.jpeg"
+          src="https://res.cloudinary.com/dtgzydbp2/image/upload/v1781062875/qris_gopay_codeirawan.jpg"
           alt="QRIS"
           style={{ width: "100%", maxWidth: 260, borderRadius: 12, marginBottom: ".75rem" }}
         />

@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Satisfy&display=swap');
+
 /* ── Reset ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { font-size: 16px; -webkit-tap-highlight-color: transparent; }
@@ -80,7 +82,7 @@ body { margin: 0; }
 
 /* ── Page container ── */
 .page {
-  position: relative; z-index: 1;
+  position: relative;
   max-width: 480px; margin: 0 auto;
   --page-px: 16px;
   padding: 0 var(--page-px) 120px;
@@ -102,8 +104,12 @@ body { margin: 0; }
   padding: 24px 0 20px;
 }
 .app-header-eyebrow {
-  font-size: 10px; font-weight: 700; letter-spacing: 3px;
-  color: var(--muted); text-transform: uppercase; margin-bottom: 4px;
+  font-family: 'Satisfy', cursive;
+  font-size: 18px; font-weight: 400; letter-spacing: 0;
+  text-transform: none; margin-bottom: 2px;
+  color: #D97706;
+  line-height: 1.4;
+  overflow: visible;
 }
 .app-header-title {
   font-size: 28px; font-weight: 900; line-height: 1.2; color: var(--text);
@@ -499,6 +505,15 @@ input[type="time"].input::-webkit-calendar-picker-indicator {
 }
 .nav-item:hover { background: rgba(217,119,6,.12); }
 .nav-item-icon { line-height: 1; display: flex; align-items: center; justify-content: center; margin-bottom: 1px; }
+.nav-label {
+  font-family: 'Satisfy', cursive;
+  font-size: 13px; font-weight: 400;
+}
+.nav-label-active {
+  font-family: 'Satisfy', cursive;
+  font-size: 13px; font-weight: 400;
+  color: #D97706;
+}
 .nav-fab {
   background: linear-gradient(135deg, #D97706, #F97316);
   box-shadow: 0 4px 20px rgba(217,119,6,.5);

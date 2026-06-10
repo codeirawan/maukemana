@@ -20,9 +20,8 @@ const RencanaIcon = () => (
 );
 
 const SudahIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="12" r="10"/>
-    <polyline points="9 12 11 14 15 10"/>
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
   </svg>
 );
 
@@ -89,13 +88,13 @@ function AppShell() {
         <button className="nav-item" onClick={() => setTab("wishlist")}
           style={{ color: tab === "wishlist" ? "#D97706" : "var(--dim)" }}>
           <span className="nav-item-icon"><RencanaIcon /></span>
-          <span>Plans</span>
+          <span className={tab === "wishlist" ? "nav-label-active" : "nav-label"}>Plans</span>
         </button>
         <button className="nav-fab" onClick={() => setShowForm(true)}>+</button>
         <button className="nav-item" onClick={() => setTab("archive")}
           style={{ color: tab === "archive" ? "#D97706" : "var(--dim)" }}>
           <span className="nav-item-icon"><SudahIcon /></span>
-          <span>Memories</span>
+          <span className={tab === "archive" ? "nav-label-active" : "nav-label"}>Memories</span>
         </button>
       </nav>
 
