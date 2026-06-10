@@ -131,6 +131,12 @@ export const IconCalendar = ({ size = 16 }) => (
   </svg>
 );
 
+export const IconChevronDown = ({ size = 16 }) => (
+  <svg {...props(size)}>
+    <polyline points="6 9 12 15 18 9"/>
+  </svg>
+);
+
 export const IconCompass = ({ size = 16 }) => (
   <svg {...props(size)}>
     <circle cx="12" cy="12" r="10"/>

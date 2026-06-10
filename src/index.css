@@ -204,14 +204,45 @@ input[type="datetime-local"].input { color-scheme: light; }
   display: flex; align-items: center; justify-content: space-between; padding: 2px 0 8px;
 }
 .filter-count { font-size: 11px; font-weight: 700; letter-spacing: .5px; color: var(--muted); text-transform: uppercase; }
-.sort-wrap { display: flex; align-items: center; gap: 6px; }
-.sort-label { font-size: 11px; font-weight: 600; color: var(--dim); }
-.sort-select {
-  padding: 4px 8px; border-radius: 8px;
-  border: 1px solid var(--border); background: var(--input-bg); color: var(--text);
-  font-size: 11px; font-weight: 600; font-family: inherit; cursor: pointer; outline: none;
+/* ── Sort Dropdown ── */
+.sort-dd { position: relative; }
+
+.sort-dd-trigger {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 10px; border-radius: 50px;
+  border: 1.5px solid var(--border); background: var(--input-bg);
+  color: var(--text); font-size: 11px; font-weight: 700;
+  font-family: inherit; cursor: pointer;
+  transition: border-color .15s, background .15s;
 }
-.sort-select:focus { border-color: var(--accent); }
+.sort-dd-trigger svg { transition: transform .2s; color: var(--dim); }
+.sort-dd-trigger.open svg { transform: rotate(180deg); }
+.sort-dd-trigger:hover { border-color: var(--accent); }
+.sort-dd-trigger.open { border-color: var(--accent); }
+
+.sort-dd-menu {
+  position: absolute; right: 0; top: calc(100% + 6px);
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; box-shadow: var(--shadow-lg);
+  min-width: 130px; z-index: 300; overflow: hidden;
+  animation: ddIn .15s ease;
+}
+@keyframes ddIn {
+  from { opacity: 0; transform: translateY(-6px) scale(.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.sort-dd-item {
+  display: flex; align-items: center; justify-content: space-between;
+  width: 100%; padding: 9px 14px; border: none;
+  background: transparent; color: var(--text);
+  font-size: 12px; font-weight: 600; font-family: inherit;
+  cursor: pointer; transition: background .12s; text-align: left;
+  gap: 8px;
+}
+.sort-dd-item:hover { background: var(--card-hov); }
+.sort-dd-item.selected { color: var(--accent); }
+.sort-dd-item.selected svg { color: var(--accent); }
 
 /* ── Date group label ── */
 .date-group-label {

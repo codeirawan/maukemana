@@ -1,11 +1,12 @@
 import { IconUtensils, IconCoffee, IconMapPin, IconBuilding } from "../ui/Icons";
+import SortDropdown from "../ui/SortDropdown";
 
 const TYPE_PILLS = [
-  { value: "semua",  label: "Semua",   icon: null,                cls: "t-semua" },
-  { value: "resto",  label: "Resto",   icon: <IconUtensils size={12} />, cls: "t-resto" },
-  { value: "cafe",   label: "Cafe",    icon: <IconCoffee size={12} />,   cls: "t-cafe" },
-  { value: "tempat", label: "Tempat",  icon: <IconMapPin size={12} />,   cls: "t-tempat" },
-  { value: "hotel",  label: "Hotel",   icon: <IconBuilding size={12} />, cls: "t-hotel" },
+  { value: "semua",  label: "Semua",  icon: null,                cls: "t-semua" },
+  { value: "resto",  label: "Resto",  icon: <IconUtensils size={12} />, cls: "t-resto" },
+  { value: "cafe",   label: "Cafe",   icon: <IconCoffee size={12} />,   cls: "t-cafe" },
+  { value: "tempat", label: "Tempat", icon: <IconMapPin size={12} />,   cls: "t-tempat" },
+  { value: "hotel",  label: "Hotel",  icon: <IconBuilding size={12} />, cls: "t-hotel" },
 ];
 
 const SORT_OPTIONS = [
@@ -35,7 +36,7 @@ export default function FilterBar({
               className={`type-pill ${p.cls}${catFilter === p.value ? " active" : ""}`}
               onClick={() => setCatFilter(p.value)}
             >
-              {p.icon && <span style={{ display: "flex", alignItems: "center" }}>{p.icon}</span>}
+              {p.icon}
               {p.label}
             </button>
           ))}
@@ -59,14 +60,7 @@ export default function FilterBar({
 
       <div className="filter-bottom-row">
         <span className="filter-count">{totalFiltered} tempat</span>
-        <div className="sort-wrap">
-          <span className="sort-label">Urut</span>
-          <select className="sort-select" value={sort} onChange={(e) => setSort(e.target.value)}>
-            {SORT_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>{o.label}</option>
-            ))}
-          </select>
-        </div>
+        <SortDropdown options={SORT_OPTIONS} value={sort} onChange={setSort} />
       </div>
     </div>
   );
