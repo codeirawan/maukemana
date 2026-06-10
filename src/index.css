@@ -169,10 +169,11 @@ input[type="datetime-local"].input { color-scheme: light; }
 .type-pills-wrap::-webkit-scrollbar { display: none; }
 .type-pills { display: flex; gap: 6px; width: max-content; }
 .type-pill {
+  display: inline-flex; align-items: center; gap: 5px;
   padding: 6px 14px; border-radius: 50px; border: none; white-space: nowrap;
   font-size: 12px; font-weight: 600; cursor: pointer;
   transition: all .18s cubic-bezier(.34,1.56,.64,1);
-  color: var(--muted);
+  color: var(--muted); font-family: inherit;
 }
 .type-pill:hover { transform: translateY(-2px); }
 .dark .type-pill { background: rgba(255,255,255,.07); }
@@ -391,9 +392,10 @@ input[type="datetime-local"].input { color-scheme: light; }
 /* Chips (form) */
 .chip-group { display: flex; gap: .35rem; flex-wrap: wrap; }
 .chip {
+  display: inline-flex; align-items: center; gap: 5px;
   padding: 7px 14px; border-radius: 50px; border: none; cursor: pointer;
   font-size: 12px; font-weight: 600; transition: all .18s cubic-bezier(.34,1.56,.64,1);
-  color: var(--muted); font-family: 'Inter', sans-serif;
+  color: var(--muted); font-family: 'Inter', sans-serif; white-space: nowrap;
 }
 .chip:hover { transform: translateY(-2px); }
 .dark .chip { background: rgba(255,255,255,.07); }

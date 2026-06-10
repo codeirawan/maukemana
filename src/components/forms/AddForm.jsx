@@ -143,7 +143,7 @@ export default function AddForm({ items, onAdd, editItem, onUpdate, onClose, sho
             <button key={c.value} type="button"
               className={`chip${category === c.value ? " active" : ""}`}
               onClick={() => setCategory(c.value)}
-              style={{ display: "flex", alignItems: "center", gap: 5 }}>
+>
               <c.Icon size={12} />{c.label}
             </button>
           ))}
@@ -158,7 +158,7 @@ export default function AddForm({ items, onAdd, editItem, onUpdate, onClose, sho
             <button key={p.value} type="button"
               className={`chip${priority === p.value ? " active" : ""}`}
               onClick={() => setPriority(priority === p.value ? null : p.value)}
-              style={{ display: "flex", alignItems: "center", gap: 5 }}>
+>
               <span style={{ width: 8, height: 8, borderRadius: "50%", background: p.dot, flexShrink: 0 }} />
               {p.label}
             </button>
