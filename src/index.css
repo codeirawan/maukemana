@@ -490,8 +490,8 @@ input[type="time"].input::-webkit-calendar-picker-indicator {
   display: flex; flex-direction: column; align-items: center; gap: 3px;
   padding: 6px 20px; border-radius: 16px; border: none; background: transparent;
   cursor: pointer; transition: background .2s;
-  font-size: 10px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase;
-  font-family: 'Inter', sans-serif;
+  font-size: 11px; font-weight: 500; letter-spacing: 0; text-transform: none;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', sans-serif;
 }
 .nav-item:hover { background: rgba(217,119,6,.12); }
 .nav-item-icon { line-height: 1; display: flex; align-items: center; justify-content: center; margin-bottom: 1px; }
