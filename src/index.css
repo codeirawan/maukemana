@@ -105,7 +105,9 @@ body { margin: 0; }
   color: var(--muted); text-transform: uppercase; margin-bottom: 4px;
 }
 .app-header-title {
-  font-size: 28px; font-weight: 900; line-height: 1.2;
+  font-size: 28px; font-weight: 900; line-height: 1.2; color: var(--text);
+}
+.app-header-title span {
   background: linear-gradient(135deg, #D97706, #F97316);
   -webkit-background-clip: text; -webkit-text-fill-color: transparent;
   background-clip: text;

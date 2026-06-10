@@ -35,7 +35,7 @@ export default function AppHeader({ dark, onToggle }) {
       <div className="app-header">
         <div>
           <div className="app-header-eyebrow">Itinerary</div>
-          <div className="app-header-title">Mau Ke Mana</div>
+          <div className="app-header-title">Mau Ke <span>Mana</span></div>
         </div>
         <div className="app-header-actions">
           <button onClick={() => setCoffeeOpen(true)} title="Support Developer"

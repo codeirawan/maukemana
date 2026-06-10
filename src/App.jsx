@@ -53,8 +53,9 @@ function AppShell() {
     </div>
   );
 
-  const wishlistCount = items.filter(i => !i.archived).length;
-  const archiveCount  = items.filter(i => i.archived).length;
+  const wishlistCount   = items.filter(i => !i.archived).length;
+  const scheduledCount  = items.filter(i => !i.archived && i.scheduledAt).length;
+  const archiveCount    = items.filter(i => i.archived).length;
 
   return (
     <div className="app-wrap">
@@ -67,6 +68,10 @@ function AppShell() {
           <div className="stat-card" style={{ background: "linear-gradient(135deg, #D97706, #F97316)", boxShadow: "0 4px 16px rgba(217,119,6,.3)" }}>
             <div className="stat-card-label">Rencana</div>
             <div className="stat-card-val">{wishlistCount}</div>
+          </div>
+          <div className="stat-card" style={{ background: "linear-gradient(135deg, #0284C7, #38BDF8)", boxShadow: "0 4px 16px rgba(2,132,199,.25)" }}>
+            <div className="stat-card-label">Terjadwal</div>
+            <div className="stat-card-val">{scheduledCount}</div>
           </div>
           <div className="stat-card" style={{ background: "linear-gradient(135deg, #059669, #34D399)", boxShadow: "0 4px 16px rgba(5,150,105,.25)" }}>
             <div className="stat-card-label">Sudah Visit</div>
