@@ -130,17 +130,23 @@ export default function AddForm({ items, onAdd, editItem, onUpdate, onClose, sho
           <>
             <PlacesSearch onSelect={handlePlaceSelect} initialValue={name} />
             {name && (
-              <input className="input" style={{ marginTop: ".5rem" }}
-                placeholder="Edit nama (opsional)" value={name}
-                onChange={(e) => { setName(e.target.value); setError(""); }} />
+              <div style={{ position: "relative" }}>
+                <input className="input" style={{ marginTop: ".5rem" }}
+                  placeholder="Edit nama (opsional)" value={name} maxLength={50}
+                  onChange={(e) => { setName(e.target.value); setError(""); }} />
+                <span className="char-count">{name.length}/50</span>
+              </div>
             )}
           </>
         ) : (
-          <input className="input input-lg"
-            placeholder="Nama tempat atau restoran *"
-            value={name}
-            onChange={(e) => { setName(e.target.value); setError(""); }}
-            autoFocus={!isEdit} />
+          <div style={{ position: "relative" }}>
+            <input className="input input-lg"
+              placeholder="Nama tempat atau restoran *"
+              value={name} maxLength={50}
+              onChange={(e) => { setName(e.target.value); setError(""); }}
+              autoFocus={!isEdit} />
+            {name.length > 0 && <span className="char-count">{name.length}/50</span>}
+          </div>
         )}
       </div>
 
@@ -203,10 +209,12 @@ export default function AddForm({ items, onAdd, editItem, onUpdate, onClose, sho
 
       {/* Catatan */}
       <div className="field">
-        <div className="input-icon-wrap">
+        <div className="input-icon-wrap" style={{ position: "relative" }}>
           <IconMessage size={14} />
           <input className="input input-with-icon" placeholder="Catatan (opsional)"
-            value={notes} onChange={(e) => setNotes(e.target.value)} />
+            value={notes} maxLength={120}
+            onChange={(e) => setNotes(e.target.value)} />
+          {notes.length > 0 && <span className="char-count">{notes.length}/120</span>}
         </div>
       </div>
 

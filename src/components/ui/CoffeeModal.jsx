@@ -1,21 +1,26 @@
+import { IconX } from "./Icons";
+
 export default function CoffeeModal({ onClose }) {
   return (
-    <div className="overlay" onClick={onClose}>
-      <div className="modal" onClick={(e) => e.stopPropagation()} style={{ textAlign: "center" }}>
-        <button className="btn-icon modal-close" onClick={onClose}>✕</button>
-        <div style={{ fontSize: "2.5rem", marginBottom: ".5rem", animation: "bounce 1s infinite" }}>☕</div>
-        <div className="modal-title">Support Developer</div>
-        <p className="text-muted" style={{ marginBottom: "1rem" }}>
-          Scan QRIS di bawah untuk traktir kopi
-        </p>
+    <div className="sheet-overlay" onClick={onClose}>
+      <div className="bottom-sheet" style={{ textAlign: "center" }} onClick={e => e.stopPropagation()}>
+
+        <div className="sheet-head">
+          <div className="sheet-handle" />
+          <div style={{ fontSize: "2.2rem", marginBottom: ".5rem", animation: "bounce 1s infinite" }}>☕</div>
+          <div className="sheet-title">Support Developer</div>
+          <p className="sheet-subtitle">Scan QRIS di bawah untuk traktir kopi</p>
+          <button className="sheet-close" onClick={onClose}><IconX size={16} /></button>
+        </div>
+
         <img
           src="/qris.jpeg"
           alt="QRIS"
-          style={{ width: "100%", maxWidth: 260, borderRadius: "var(--radius-sm)" }}
+          style={{ width: "100%", maxWidth: 260, borderRadius: 12, marginBottom: ".75rem" }}
         />
-        <p className="text-xs text-muted" style={{ marginTop: ".75rem" }}>Terima kasih! 🙏</p>
+        <p style={{ fontSize: ".78rem", color: "var(--muted)" }}>Terima kasih! 🙏</p>
+
       </div>
-      <style>{`@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}`}</style>
     </div>
   );
 }
